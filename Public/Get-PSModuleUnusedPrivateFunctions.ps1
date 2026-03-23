@@ -42,7 +42,7 @@ function Get-PSModuleUnusedPrivateFunctions {
         $_.References -eq 0
 
     } |
-    Sort-Object TotalLines -Descending |
+    Sort-Object Function  |
     Select-Object `
         ModuleName,
     Version,
@@ -50,5 +50,7 @@ function Get-PSModuleUnusedPrivateFunctions {
     TotalLines,
     References,
     PartOfFile,
-    FullName
+    FullName, 
+    ModificationDate, 
+    FileSize
 }

@@ -24,7 +24,8 @@ PSModuleQuantityAnalyzer.
 .OUTPUTS
 PSCustomObject. The output contains module and count summary properties:
 ModuleName, Version, LastUpdate, ModulePath, PublicFunctions,
-PrivateFunctions, TotalFunctions, PublicFiles, PrivateFiles, and TotalFiles.
+PrivateFunctions, TotalFunctions, PublicFiles, PrivateFiles, TotalFiles,
+and TotalLines.
 
 .NOTES
 This function uses Get-PSModuleQuantity to calculate function counts.
@@ -92,7 +93,7 @@ function Get-PSModuleSummary {
         PublicFiles      = $publicFiles.Count
         PrivateFiles     = $privateFiles.Count
         TotalFiles       = $publicFiles.Count + $privateFiles.Count
-
+        TotalLines       = ($quantityData | Measure-Object -Property TotalLines -Sum).Sum
         ModulePath       = $modulePath
     }
 }

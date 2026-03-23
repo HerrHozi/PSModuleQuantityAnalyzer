@@ -66,21 +66,22 @@ function Get-PSModuleQuantity {
         $helpTopics = Get-PSHelpTopics -Path $func.File -FunctionName $func.Name
 
         [PSCustomObject]@{
-            CollectionDate   = $collectionDate
-            ModuleName       = $module.Name
-            Version          = $module.Version
             Function         = $func.Name
+            Type             = If (($func.File).ToLower().Contains('\public')) { 'Public' } else { 'Private' }
             HelpTopics       = $helpTopics
             TotalLines       = $lineInfo.TotalLines
             LinesOfHelp      = $helpTopics
             LinesOfCode      = $lineInfo.LinesOfCode
             LinesOfComment   = $lineInfo.LinesOfComment
-            References       = $references
+            References       = [int]$references
             PartOfFile       = $($func.File).Split('\')[-1]
+            ModificationDate = (Get-Item $func.File).LastWriteTime
             FullName         = $func.File
             CreationDate     = (Get-Item $func.File).CreationTime
-            ModificationDate = (Get-Item $func.File).LastWriteTime
             FileSize         = (Get-Item $func.File).Length
+            CollectionDate   = $collectionDate
+            ModuleName       = $module.Name
+            Version          = $module.Version
         }
     }
 }
