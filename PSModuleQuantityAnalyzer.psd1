@@ -8,14 +8,14 @@
 
 @{
     RootModule        = 'PSModuleQuantityAnalyzer.psm1'
-    ModuleVersion     = '2026.3.22.1040'
+    ModuleVersion     = '2026.5.8.632'
     GUID              = 'a5c1c2d4-1b11-4d55-b2d3-1d9a0e8b2f11'
 
-    Author            = 'zimmermann.holger@live.de'
+    Author            = 'Holger Zimmermann | zimmermann.holger@live.de'
     CompanyName       = 'Community'
     Copyright         = '(c) 2026 Holger Zimmermann'
 
-    Description       = "PSModuleQuantityAnalyzer is a PowerShell module that performs static analysis of PowerShell modules and`n               generates quantitative metrics about their structure, maintainability, and architecture."
+    Description       = "PSModuleQuantityAnalyzer is a PowerShell module that performs static analysis of PowerShell modules and`n                   generates quantitative metrics about their structure, maintainability, and architecture."
 
     PowerShellVersion = '5.1'
 
@@ -29,6 +29,7 @@
         "Get-PSModuleDocumentationCoverage",
         "Get-PSModuleDependencyGraph",
         "Get-PSModuleComplexity",
+        "Get-PSModuleUsedVerbs",
         "Get-PSModuleUnusedPrivateFunctions",
         "Get-PSModuleRefactoringCandidates",
         "Export-PSModuleQuantityReport",
@@ -45,9 +46,13 @@
             ProjectUri   = 'https://github.com/HerrHozi/PSModuleQuantityAnalyzer'
             LicenseUri   = 'https://github.com/HerrHozi/PSModuleQuantityAnalyzer/blob/main/LICENSE'
             IconUri      = 'https://raw.githubusercontent.com/HerrHozi/PSModuleQuantityAnalyzer/main/Assets/icon.png'
-            LastUpdate   = '2026-03-22'
+            LastUpdate   = '2026-05-08'
             ReleaseNotes = '            
-v2026.3.22.1040 - Updated PSModuleQuantityAnalyzer to version 2026.3.22.1040.
+v2026.5.8.632 
+        - Added Function Get-PSModuleUsedVerbs
+
+v2026.3.22.1040 
+        - Updated PSModuleQuantityAnalyzer to version 2026.3.22.1040.
 		- Minor bug fixes and performance improvements.
         
 v2026.3.14.420 - Initial release of PSModuleQuantityAnalyzer on PS Gallery.

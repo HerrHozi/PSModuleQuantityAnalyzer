@@ -1,193 +1,93 @@
 function Write-Syntax {
-
-    ################################################################################
-    #####                                                                      ##### 
-    ##### Format the command based on the new Windows Terminal color schema    #####                               
-    #####                                                                      #####  
-    ################################################################################
-
-    [CmdletBinding(DefaultParameterSetName = 'ByArrays')]
-    Param (
-        [Parameter(ParameterSetName = 'ByArrays')]
-        [String[]]$Text,
-
-        [Parameter(ParameterSetName = 'ByArrays')]
-        [ConsoleColor[]]$Color,
-
-        [Parameter(ParameterSetName = 'ByPairs', Mandatory = $true, Position = 0)]
-        [Object[]]$TextColor,
-
-        [Parameter(ParameterSetName = 'BySegments', Mandatory = $true)]
-        [Object[]]$Segment,
-
-        [Switch]$NoNewline = $false
+    param(
+        [string]$Code
     )
-
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    #################### main code | out- host #####################
-
-    function Get-SegmentValue {
-        param (
-            [Parameter(Mandatory = $true)]
-            [Object]$InputObject,
-
-            [Parameter(Mandatory = $true)]
-            [String]$Name
-        )
-
-        if ($InputObject -is [System.Collections.IDictionary]) {
-            if ($InputObject.Contains($Name)) {
-                return $InputObject[$Name]
-            }
-            return $null
-        }
-
-        $Property = $InputObject.PSObject.Properties[$Name]
-        if ($null -ne $Property) {
-            return $Property.Value
-        }
-
-        return $null
+    try {
+        $CurrentFunction = Get-FunctionName
+        Write-Log -Message "### Start Function $CurrentFunction ###"
+        $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
+        #################### main code | out- host #####################
+    }
+    catch {
+        <#Do this if a terminating exception happens#>
     }
 
-    function Get-LineOptionAnsiColor {
-        param (
-            [Parameter(Mandatory = $true)]
-            [String]$LineOption,
 
-            [Object]$PSReadLineOption
-        )
-
-        if ($null -eq $PSReadLineOption) {
-            return $null
+    $tokens = $null; $errors = $null
+    $ast = [System.Management.Automation.Language.Parser]::ParseInput($Code, [ref]$tokens, [ref]$errors)
+    
+    $totalPos = 0
+    
+    foreach ($token in $tokens) {
+        # Sicherer Pre-Text
+        $preLen = [Math]::Max(0, $token.Extent.StartOffset - $totalPos)
+        if ($preLen -gt 0 -and $totalPos + $preLen -le $Code.Length) {
+            $preText = $Code.Substring($totalPos, $preLen)
+            Write-Host $preText -NoNewline -ForegroundColor Gray
         }
-
-        $lineOptionMap = @{
-            'Command'              = 'CommandColor'
-            'Parameter'            = 'ParameterColor'
-            'Value'                = 'DefaultTokenColor'
-            'ValueQuoted'          = 'StringColor'
-            'WordDelimiters'       = 'OperatorColor'
-            'ScriptBlockArguments' = 'CommandColor'
-            'Operator'             = 'OperatorColor'
-            'String'               = 'StringColor'
-            'Variable'             = 'VariableColor'
-            'Keyword'              = 'KeywordColor'
-            'Type'                 = 'TypeColor'
-            'Number'               = 'NumberColor'
-            'Member'               = 'MemberColor'
-            'Comment'              = 'CommentColor'
-            'Error'                = 'ErrorColor'
-            'DefaultToken'         = 'DefaultTokenColor'
-            'Emphasis'             = 'EmphasisColor'
+        
+        # Token farbig
+        $color = if ($token.Text -match '^(MATCH|RETURN|SET|REMOVE|WITH|WHERE|NOT|IN|AND|OR|AS|LIMIT|ORDER|BY|SKIP|OPTIONAL|CALL|YIELD|MERGE|CREATE|DELETE|DETACH|UNWIND|FOREACH|UNION)$') {
+            'Magenta'
         }
-
-        $PropertyName = $lineOptionMap[$LineOption]
-        if ([string]::IsNullOrWhiteSpace($PropertyName)) {
-            if ($LineOption -match 'Color$') {
-                $PropertyName = $LineOption
-            }
-            else {
-                $PropertyName = "{0}Color" -f $LineOption
-            }
+        elseif ($token.Text -match '^(true|false)$|:(true|false)$') {
+            'Cyan'
         }
-
-        $Property = $PSReadLineOption.PSObject.Properties[$PropertyName]
-        if ($null -eq $Property -or [string]::IsNullOrWhiteSpace([string]$Property.Value)) {
-            return $null
-        }
-
-        return [string]$Property.Value
-    }
-
-    $OutputSegments = @()
-    $PSReadLineOption = Get-PSReadLineOption -ErrorAction SilentlyContinue
-    $AnsiReset = [char]27 + '[0m'
-
-    switch ($PSCmdlet.ParameterSetName) {
-        'ByPairs' {
-            if ($TextColor.Count % 2 -ne 0) {
-                throw "TextColor expecting: Color, Text, Color, Text ..."
-            }
-
-            for ($i = 0; $i -lt $TextColor.Count; $i += 2) {
-                $OutputSegments += [PSCustomObject]@{
-                    Text         = [string]$TextColor[$i + 1]
-                    ConsoleColor = [ConsoleColor]$TextColor[$i]
-                    AnsiColor    = $null
-                }
-            }
-        }
-        'BySegments' {
-            foreach ($CurrentSegment in $Segment) {
-                $SegmentText = Get-SegmentValue -InputObject $CurrentSegment -Name 'Text'
-                $SegmentColor = Get-SegmentValue -InputObject $CurrentSegment -Name 'Color'
-                $LineOption = Get-SegmentValue -InputObject $CurrentSegment -Name 'LineOption'
-
-                if ($null -eq $SegmentText) {
-                    throw "Each segment must contain text."
-                }
-
-                if ($null -ne $SegmentColor) {
-                    $OutputSegments += [PSCustomObject]@{
-                        Text         = [string]$SegmentText
-                        ConsoleColor = [ConsoleColor]$SegmentColor
-                        AnsiColor    = $null
-                    }
-                    continue
-                }
-
-                if ($null -eq $LineOption) {
-                    throw "Each segment must contain Color or LineOption."
-                }
-
-                $AnsiColor = Get-LineOptionAnsiColor -LineOption ([string]$LineOption) -PSReadLineOption $PSReadLineOption
-                if ($null -ne $AnsiColor) {
-                    $OutputSegments += [PSCustomObject]@{
-                        Text         = [string]$SegmentText
-                        ConsoleColor = $null
-                        AnsiColor    = $AnsiColor
-                    }
-                }
-                else {
-                    $OutputSegments += [PSCustomObject]@{
-                        Text         = [string]$SegmentText
-                        ConsoleColor = [ConsoleColor]::Gray
-                        AnsiColor    = $null
-                    }
-                }
-            }
-        }
-        default {
-            if (-not $Text -or -not $Color -or $Text.Count -ne $Color.Count) {
-                throw "Text and Color must be set and contain the same number of elements."
-            }
-
-            for ($i = 0; $i -lt $Text.Length; $i++) {
-                $OutputSegments += [PSCustomObject]@{
-                    Text         = [string]$Text[$i]
-                    ConsoleColor = [ConsoleColor]$Color[$i]
-                    AnsiColor    = $null
-                }
-            }
-        }
-    }
-
-    foreach ($CurrentOutputSegment in $OutputSegments) {
-        if (-not [string]::IsNullOrWhiteSpace($CurrentOutputSegment.AnsiColor)) {
-            Write-Host ("{0}{1}{2}" -f $CurrentOutputSegment.AnsiColor, $CurrentOutputSegment.Text, $AnsiReset) -NoNewLine | Out-Host
+        elseif ($token.Text -match "='[^']*'$") {
+            'Green'
         }
         else {
-            Write-Host $CurrentOutputSegment.Text -ForegroundColor $CurrentOutputSegment.ConsoleColor -NoNewLine | Out-Host
+            switch -Regex ($token.Kind) {
+                'Identifier' { If ($token.TokenFlags -eq 'CommandName') { 'Yellow' } else { 'White' }; break }
+                'Generic|Command' { If ($token.TokenFlags -eq 'CommandName') { 'Yellow' } else { 'White' }; break }
+                'String|HereString' { 'Green' }
+                'If|Else|For|Foreach|Function|While|Do|Until' { 'Cyan' }
+                'Variable' { 'Green' }
+                'Number' { 'White' }
+                'StringLiteral' { 'Blue' }
+                'Parameter' { 'DarkGray' }
+                '^I|Pipe|and' { 'DarkGray' }
+                'Operator|GroupStart|GroupEnd|Comment' { 'DarkGray' }
+                default { 'White' }
+            }
         }
+        
+        Write-Host $token.Text -NoNewline -ForegroundColor $color
+        
+
+        $newPos = [Math]::Min($Code.Length, $token.Extent.EndOffset)
+        $totalPos = $newPos
+    }
+    
+
+    if ($totalPos -lt $Code.Length) {
+        $rest = $Code.Substring($totalPos)
+        Write-Host $rest -NoNewline -ForegroundColor Gray
+    }
+    
+    Write-Host ""
+    try {
+        Write-Log -Message "    >> Write Syntax for Highlighting for '$Code'."
+        ######################## main code ############################
+        $runtime = Get-RunTime -StartRunTime $StartRunTime
+        Write-Log -Message "    Run Time: $runtime [h] ###"
+        Write-Log -Message "### End Function $CurrentFunction ###"
+    }
+    catch {
+        <#Do this if a terminating exception happens#>
     }
 
-    If ($NoNewline -eq $false) { Write-Host '' | out-host }
-    
-    Write-Log -Message "    >> Highlighted output generated."
-    ######################## main code ############################
-    #$runtime = Get-RunTime -StartRunTime $StartRunTime
-    #Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
 }
+
+
+#$code = "Get-PSModuleQuantity -ModuleName .\PSModuleQuantityAnalyzer.psd1 | Where-Object {`$_.Type -eq 'Private' -and `$_.References -eq 0} | ft"
+#$code = "MATCH (n:Base {highvalue:False})-[r]->(m {highvalue:True}) WHERE NOT type(r) IN ['WriteOwnerRaw','OwnsRaw', 'LocalToComputer']"
+#$code = "Get-ADUser -SearchBase 'Ldap:\\dsdadf' -Filter 'homePhone -like 1000' -Properties a,b | Select-Object name,asss | Sort-Object samaccountname  | Format-Table | Out-Host"
+
+#$code = "Get-ADGroupMember -Identity 'Domain Admins' -Recursive | Select-Object -First 10 | Format-Table"
+#
+#Write-Syntax -Code $code
+
+#$code = "MATCH (s:Base {highvalue:True}) SET s.highvalue = false REMOVE s:Tag_Tier_Zero, s.hvtreason, s.system_tags, s.MemberofTier0Group RETURN s.name"
+#Write-Syntax -Code $code
+

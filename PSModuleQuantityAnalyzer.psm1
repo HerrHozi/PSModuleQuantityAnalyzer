@@ -49,42 +49,24 @@ if ($PSVersionTable.PSEdition -eq 'Core') {
 
 $PixelPath = Join-Path -Path $SAModulePath -ChildPath "Assets\PSModuleQA.piskel"
 Show-PiskelFile -AddShadow -PiskelPath $PixelPath
-Write-Host "  Description: $($SAModuleManifest.Description) " -ForegroundColor Gray
-Write-Host "  Version:     $($SAModuleManifest.Version) | Last Update: $SAModuleLastUpdate | Author: $($SAModuleManifest.Author) " -ForegroundColor Gray
-Write-Host "`n  Quick Start: " -ForegroundColor Gray -NoNewline
+Write-Host "  Description:     $($SAModuleManifest.Description) " -ForegroundColor Gray
+Write-Host "  Version:         $($SAModuleManifest.Version) | Last Update: $SAModuleLastUpdate | Author: $($SAModuleManifest.Author) " -ForegroundColor Gray
+Write-Host "`n  [>] Quick-Start: " -ForegroundColor Gray -NoNewline
 
-Write-Syntax -Segment @(
-    @{ LineOption = 'Command'; Text = "Get-PSModuleSummary " }
-    @{ LineOption = 'Parameter'; Text = "-ModuleName " }
-    @{ LineOption = 'Value'; Text = ".\PSModuleQuantityAnalyzer.psd1" }
-)
 
-Write-Syntax -Segment @(
-    @{ LineOption = 'Command'; Text = "               Get-PSModuleQuantity " }
-    @{ LineOption = 'Parameter'; Text = "-ModuleName " }
-    @{ LineOption = 'Value'; Text = "PSModuleQuantityAnalyzer " }
-    @{ LineOption = 'WordDelimiters'; Text = "| " }
-    @{ LineOption = 'ScriptBlockArguments'; Text = "Where-Object " }
-    @{ LineOption = 'Member'; Text = "{" }
-    @{ LineOption = 'Variable'; Text = "`$_" }
-    @{ LineOption = 'Member'; Text = ".Type " }
-    @{ LineOption = 'Operator'; Text = "-eq " }
-    @{ LineOption = 'ValueQuoted'; Text = "'Private' " } 
-    @{ LineOption = 'Operator'; Text = "-and " }
-    @{ LineOption = 'Variable'; Text = "`$_" }
-    @{ LineOption = 'Member'; Text = ".References " }
-    @{ LineOption = 'Operator'; Text = "-eq " }
-    @{ LineOption = 'Number'; Text = "0" }
-    @{ LineOption = 'Member'; Text = "} " }
-    @{ LineOption = 'WordDelimiters'; Text = "| " }
-    @{ LineOption = 'ScriptBlockArguments'; Text = "ft" }
-)
+$code = "Get-PSModuleSummary -ModuleName .\PSModuleQuantityAnalyzer.psd1"
+Write-Syntax -Code $code
 
-Write-Syntax -Segment @(
-    @{ LineOption = 'Command'; Text = "               Export-PSModuleMarkdownReport " }
-    @{ LineOption = 'Parameter'; Text = "-ModuleName " }
-    @{ LineOption = 'Value'; Text = "PSModuleQuantityAnalyzer " }
-)
+$code = "                   Get-PSModuleQuantity -ModuleName PSModuleQuantityAnalyzer | Where-Object {`$_.Type -eq 'Private' -and `$_.References -eq 0} | ft"
+Write-Syntax -Code $code
+$code = "                   Get-PSModuleUnusedPrivateFunctions -ModuleName PSModuleQuantityAnalyzer | Select-Object Function, TotalLines, ModificationDate, PartOfFile | ft"
+Write-Syntax -Code $code
+$code = "                   Get-PSModuleDuplicateFunctions -ModuleName PSModuleQuantityAnalyzer | Select-Object Function, TotalLines, DuplicateCount, PartOfFile | ft"
+Write-Syntax -Code $code
+$code = "                   Get-PSModuleUsedVerbs -ModuleName '.\as2go.psd1' | Select-object Verb, Count | Sort-object Verb"
+Write-Syntax -Code $code
+$code = "                   Export-PSModuleMarkdownReport -ModuleName PSModuleQuantityAnalyzer"
+Write-Syntax -Code $code
 
 Write-host "`n"
 $host.ui.RawUI.WindowTitle = "$SAModuleName - $($SAModuleManifest.Version)"
