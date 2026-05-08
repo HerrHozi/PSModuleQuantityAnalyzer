@@ -2,6 +2,7 @@
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1%20%7C%207%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Module Type](https://img.shields.io/badge/type-PowerShell%20Module-orange)
+![PowerShellGallery](https://img.shields.io/powershellgallery/v/PSModuleQuantityAnalyzer)
 ![Maintenance](https://img.shields.io/badge/status-active-brightgreen)
 
 **PSModuleQuantityAnalyzer** is a PowerShell module that performs **static analysis of PowerShell modules** and generates quantitative metrics about their structure, maintainability, and architecture.
