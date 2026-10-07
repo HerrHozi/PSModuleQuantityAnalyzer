@@ -37,21 +37,21 @@ function Get-PSModuleDuplicateFunctions {
     $functions = Get-PSModuleQuantity -ModuleName $ModuleName
 
     $duplicates = $functions |
-        Group-Object Function |
-        Where-Object Count -gt 1
+    Group-Object Function |
+    Where-Object Count -gt 1
 
     foreach ($dup in $duplicates) {
 
         foreach ($item in $dup.Group) {
 
             [PSCustomObject]@{
-                Function     = $item.Function
-                File         = $item.PartOfFile
-                FullName     = $item.FullName
-                TotalLines   = $item.TotalLines
-                LinesOfCode  = $item.LinesOfCode
-                References   = $item.References
-                DefinitionID = $dup.Count
+                Function       = $item.Function
+                PartOfFile     = $item.PartOfFile
+                FullName       = $item.FullName
+                TotalLines     = $item.TotalLines
+                LinesOfCode    = $item.LinesOfCode
+                References     = $item.References
+                DuplicateCount = $dup.Count
             }
 
         }

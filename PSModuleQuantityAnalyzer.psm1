@@ -70,3 +70,4 @@ Write-Syntax -Code $code
 
 Write-host "`n"
 $host.ui.RawUI.WindowTitle = "$SAModuleName - $($SAModuleManifest.Version)"
+

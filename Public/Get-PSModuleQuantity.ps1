@@ -22,9 +22,12 @@ Returns function-level quantity metrics for PSModuleQuantityAnalyzer.
 Get-PSModuleQuantity .\PSModuleQuantityAnalyzer.psd1  | Select-Object Version, Function, HelpTopics, TotalLines,LinesOfCode, LinesOfComment,References,PartOfFile,ModificationDate | ft
 Returns dedicated metrics for PSModuleQuantityAnalyzer.
 
+Get-PSModuleQuantity -ModuleName .\SSAwBH.psd1 | Group-Object NestedModule
+Groups the functions by nested module ('(main)' for the module itself).
+
 .OUTPUTS
 PSCustomObject. Each output object includes CollectionDate, ModuleName,
-Version, Function, TotalLines, LinesOfCode, LinesOfComment, References,
+Version, Function, NestedModule, TotalLines, LinesOfCode, LinesOfComment, References,
 PartOfFile, FullName, CreationDate, ModificationDate, and FileSize.
 
 .NOTES
@@ -51,10 +54,13 @@ function Get-PSModuleQuantity {
     $astCache = Get-PSModuleAstCache -Files $files
     $referenceMap = Get-PSModuleReferenceMap -AstCache $astCache
     $functions = Get-PSFunctionDefinitions -AstCache $astCache
+    $nestedRoots = @(Get-PSModuleNestedRoots -Module $module | Sort-Object { $_.Root.Length } -Descending)
 
     foreach ($func in $functions) {
 
         $lineInfo = Measure-PSFunctionLines -FunctionAst $func
+
+        $nested = $nestedRoots | Where-Object { $func.File.StartsWith($_.Root, [System.StringComparison]::OrdinalIgnoreCase) } | Select-Object -First 1
 
         $references = if ($referenceMap.ContainsKey($func.Name)) {
             $referenceMap[$func.Name]
@@ -67,6 +73,7 @@ function Get-PSModuleQuantity {
 
         [PSCustomObject]@{
             Function         = $func.Name
+            NestedModule     = if ($nested) { $nested.Name } else { '(main)' }
             Type             = If (($func.File).ToLower().Contains('\public')) { 'Public' } else { 'Private' }
             HelpTopics       = $helpTopics
             TotalLines       = $lineInfo.TotalLines

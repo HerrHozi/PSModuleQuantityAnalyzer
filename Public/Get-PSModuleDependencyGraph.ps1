@@ -47,16 +47,16 @@ function Get-PSModuleDependencyGraph {
         )
 
         $functions = $ast.FindAll({
-            param($node)
-            $node -is [System.Management.Automation.Language.FunctionDefinitionAst]
-        }, $true)
+                param($node)
+                $node -is [System.Management.Automation.Language.FunctionDefinitionAst]
+            }, $true)
 
         foreach ($func in $functions) {
 
             $commands = $func.FindAll({
-                param($node)
-                $node -is [System.Management.Automation.Language.CommandAst]
-            }, $true)
+                    param($node)
+                    $node -is [System.Management.Automation.Language.CommandAst]
+                }, $true)
 
             foreach ($cmd in $commands) {
 

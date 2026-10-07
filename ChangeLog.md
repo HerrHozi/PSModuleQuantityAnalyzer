@@ -6,10 +6,16 @@ All notable changes to this project are documented in this file.
 
 - Holger Zimmermann [zimmermann.holger@live.de]
 
+- Version 2026.10.7.652
+  - TBD
+
+- Version 2026.10.7.650
+  - TBD
+
 ## Current Release
 
 - Version: 2026.5.8.632
-- Last Update: 2026-05-08
+- Last Update:     2026-10-07
 
 ## [2026.5.8.632]
 
