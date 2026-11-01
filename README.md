@@ -4,7 +4,8 @@
 ![Module Type](https://img.shields.io/badge/type-PowerShell%20Module-orange)
 ![PowerShellGallery](https://img.shields.io/powershellgallery/v/PSModuleQuantityAnalyzer)
 ![Maintenance](https://img.shields.io/badge/status-active-brightgreen)
-[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HerrHozi/PSModuleQuantityAnalyzer)
+[![Ask DeepWiki](https://raw.githubusercontent.com/HerrHozi/GCCare/main/.github/assets/badge-deepwiki.svg)](https://deepwiki.com/HerrHozi/PSModuleQuantityAnalyzer)
+
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
