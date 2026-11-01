@@ -4,12 +4,12 @@
 ![Module Type](https://img.shields.io/badge/type-PowerShell%20Module-orange)
 ![PowerShellGallery](https://img.shields.io/powershellgallery/v/PSModuleQuantityAnalyzer)
 ![Maintenance](https://img.shields.io/badge/status-active-brightgreen)
-[![Ask DeepWiki](https://raw.githubusercontent.com/HerrHozi/GCCare/main/.github/assets/badge-deepwiki.svg)](https://deepwiki.com/HerrHozi/PSModuleQuantityAnalyzer)
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HerrHozi/PSModuleQuantityAnalyzer)
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.10.7.652
-Last Update:     2026-10-07
+Current Version: 2026.10.26.1048
+Last Update:     2026-10-26
 ```
 
 PSModuleQuantityAnalyzer is a pure PowerShell module for the static analysis of
@@ -133,7 +133,7 @@ Explicit (manifest), implicit (code) and - with `-IncludeTransitiveDependencies`
 ### Show the verbs used by a module
 
 ```powershell
-Get-PSModuleUsedVerbs -ModuleName .\MyModule.psd1 | Select-Object Verb, Count | Sort-Object Verb
+Get-PSModuleUsedVerbs -ModuleName .\MyModule.psd1 | Select-object Verb, Count, Approved | Sort-Object Verb
 ```
 
 ### Analyze nested modules

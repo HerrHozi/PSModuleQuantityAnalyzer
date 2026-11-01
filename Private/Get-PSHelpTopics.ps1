@@ -40,32 +40,3 @@ function  Get-PSHelpTopics {
     }
     return $HelpTopics
 }
-
-
-
-function Get-FunctionHelpLines_old {
-
-    param(
-        [Parameter(Mandatory)]
-        $FunctionAst,
-
-        [Parameter(Mandatory)]
-        $Tokens
-    )
-
-    $functionStart = $FunctionAst.Extent.StartLineNumber
-
-    $helpTokens = $Tokens | Where-Object {
-        $_.Kind -eq 'Comment' -and
-        $_.Extent.EndLineNumber -lt $functionStart -and
-        $_.Text -match '<#'
-    }
-
-    if (-not $helpTokens) {
-        return 0
-    }
-
-    $helpText = $helpTokens[-1].Text
-
-    ($helpText -split "\r?\n").Count
-}

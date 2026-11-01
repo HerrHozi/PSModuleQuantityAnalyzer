@@ -1,10 +1,9 @@
 _ToDo/*
 _MyUtilities/*
 .vscode/*
-Export/*
-Lib/*
 PSModuleQuantityAnalyzer.code-workspace
 launch.json
 your_data/*
-Corefunctions/*
 ChangeLog.md
+Assets/*.piskel
+Assets/*.gpl

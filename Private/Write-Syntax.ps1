@@ -2,16 +2,6 @@ function Write-Syntax {
     param(
         [string]$Code
     )
-    try {
-        $CurrentFunction = Get-FunctionName
-        Write-Log -Message "### Start Function $CurrentFunction ###"
-        $StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-        #################### main code | out- host #####################
-    }
-    catch {
-        <#Do this if a terminating exception happens#>
-    }
-
 
     $tokens = $null; $errors = $null
     $ast = [System.Management.Automation.Language.Parser]::ParseInput($Code, [ref]$tokens, [ref]$errors)
@@ -53,12 +43,10 @@ function Write-Syntax {
         }
         
         Write-Host $token.Text -NoNewline -ForegroundColor $color
-        
 
         $newPos = [Math]::Min($Code.Length, $token.Extent.EndOffset)
         $totalPos = $newPos
     }
-    
 
     if ($totalPos -lt $Code.Length) {
         $rest = $Code.Substring($totalPos)
@@ -66,19 +54,8 @@ function Write-Syntax {
     }
     
     Write-Host ""
-    try {
-        Write-Log -Message "    >> Write Syntax for Highlighting for '$Code'."
-        ######################## main code ############################
-        $runtime = Get-RunTime -StartRunTime $StartRunTime
-        Write-Log -Message "    Run Time: $runtime [h] ###"
-        Write-Log -Message "### End Function $CurrentFunction ###"
-    }
-    catch {
-        <#Do this if a terminating exception happens#>
-    }
 
 }
-
 
 #$code = "Get-PSModuleQuantity -ModuleName .\PSModuleQuantityAnalyzer.psd1 | Where-Object {`$_.Type -eq 'Private' -and `$_.References -eq 0} | ft"
 #$code = "MATCH (n:Base {highvalue:False})-[r]->(m {highvalue:True}) WHERE NOT type(r) IN ['WriteOwnerRaw','OwnsRaw', 'LocalToComputer']"

@@ -20,15 +20,10 @@ $Script:FGCSuccess = [System.ConsoleColor]::Green
 $Script:ConsoleBGColor = [System.ConsoleColor]::Black    # Background remains black
 $Script:ConsoleFGColor = [System.ConsoleColor]::Gray     # Default text gray
 
-$Script:DateFormatLog = "yyyy-MM-dd HH:mm:ss.fff"
-$Script:DateFormatSA = "yyyy-MM-dd HH:mm:ss"
-
 $SAModulePath = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
 $SAModuleName = $MyInvocation.MyCommand.ScriptBlock.Module.Name
 $SAModuleManifest = (Test-ModuleManifest -Path $(join-path $SAModulePath -ChildPath "\$SAModuleName.psd1"))
 $SAModuleLastUpdate = $SAModuleManifest.PrivateData.PSData.LastUpdate
-
-$Script:SAModuleLog = Join-Path -Path $SAModulePath -ChildPath "$SAModuleName.log"
 
 $PublicFunctions = Get-ChildItem -Path "$PSScriptRoot/Public/*.ps1" -ErrorAction SilentlyContinue
 $PrivateFunctions = Get-ChildItem -Path "$PSScriptRoot/Private/*.ps1" -ErrorAction SilentlyContinue
@@ -43,31 +38,46 @@ foreach ($file in $PublicFunctions) {
 
 Export-ModuleMember -Function $PublicFunctions.BaseName
 
-if ($PSVersionTable.PSEdition -eq 'Core') {
-    $PSStyle.Formatting.TableHeader = "`e[90m"
+If ($PSVersionTable.PSVersion -ge [version]'7.2') {
+    $Script:PoSH7 = $true
+    $PSStyle.Formatting.TableHeader = "`e[90m"   # DarkGray
+    $PSStyle.Formatting.FormatAccent = "`e[90m" # DarkGray
+    #Cyan → "e[96m"
+    #White → "e[97m"
 }
 
-$PixelPath = Join-Path -Path $SAModulePath -ChildPath "Assets\PSModuleQA.piskel"
-Show-PiskelFile -AddShadow -PiskelPath $PixelPath
-Write-Host "  Description:     $($SAModuleManifest.Description) " -ForegroundColor Gray
-Write-Host "  Version:         $($SAModuleManifest.Version) | Last Update: $SAModuleLastUpdate | Author: $($SAModuleManifest.Author) " -ForegroundColor Gray
-Write-Host "`n  [>] Quick-Start: " -ForegroundColor Gray -NoNewline
+$Script:PSModuleQALogoJson = @'
+{"modelVersion":2,"piskel":{"name":"PSModuleQA","description":"","fps":12,"height":15,"width":60,"layers":["{\"name\":\"Layer 1\",\"opacity\":1,\"frameCount\":1,\"chunks\":[{\"layout\":[[0]],\"base64PNG\":\"data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAPCAYAAAC4EqxxAAABKUlEQVRIS+1WMQ7CMAxsXsDCxIKAFokXdOsj2JmZmZmZmZnZeUS3vgCJFhALEwsvCHIlR8aKk0ogBA1dEjuue+c7RVVRYI8KjG8UNuHzdqKp4oPZ3gzEdpamqS6KwtTw+B3ugZ60D/0exSRhpXno86QwNOAvQszzCADBAAi69xF1DabpEE/rWA8XlcGPsZRHTC8TRrJ0/QTh47KvR6uLwY+xlBcJN7E0ugDVsK3chjZrUjV5D+4iiKmdq3lPx5urIYwxrHzgtM6psKQUWlyyn4+IjZyLMCWKmMppVye7m8GPsZRvZOmvJpx1dJLfa8KlsOdn3ksLCUu3t0vhppZ21dHLEOuo2odM1fYd51rBnq5Yj3mrwr7Lpg3nYf94tEFBH4e/wr4J/fr5Awi5bB/QiNNjAAAAAElFTkSuQmCC\"}]}"]}}
+'@
+Show-PiskelFile -AddShadow -PiskelJson $Script:PSModuleQALogoJson
 
+Write-Host "  Description:     PSModuleQuantityAnalyzer performs static analysis of PowerShell modules, including their nested modules." -ForegroundColor Gray
+Write-Host "  Version:         $($SAModuleManifest.Version) | Last Update: $SAModuleLastUpdate | Author: $($SAModuleManifest.Author) " -ForegroundColor Gray
+Write-Host "`n[>] Quick-Start: " -ForegroundColor Gray
 
 $code = "Get-PSModuleSummary -ModuleName .\PSModuleQuantityAnalyzer.psd1"
 Write-Syntax -Code $code
-
-$code = "                   Get-PSModuleQuantity -ModuleName PSModuleQuantityAnalyzer | Where-Object {`$_.Type -eq 'Private' -and `$_.References -eq 0} | ft"
+$code = "Get-PSModuleQuantity -ModuleName PSModuleQuantityAnalyzer | Where-Object {`$_.Type -eq 'Private' -and `$_.References -eq 0} | ft"
 Write-Syntax -Code $code
-$code = "                   Get-PSModuleUnusedPrivateFunctions -ModuleName PSModuleQuantityAnalyzer | Select-Object Function, TotalLines, ModificationDate, PartOfFile | ft"
+$code = "Get-PSModuleUnusedPrivateFunctions -ModuleName PSModuleQuantityAnalyzer | Select-Object Function, TotalLines, ModificationDate, PartOfFile | ft"
 Write-Syntax -Code $code
-$code = "                   Get-PSModuleDuplicateFunctions -ModuleName PSModuleQuantityAnalyzer | Select-Object Function, TotalLines, DuplicateCount, PartOfFile | ft"
+$code = "Get-PSModuleDuplicateFunctions -ModuleName PSModuleQuantityAnalyzer | Select-Object Function, TotalLines, DuplicateCount, PartOfFile | ft"
 Write-Syntax -Code $code
-$code = "                   Get-PSModuleUsedVerbs -ModuleName '.\as2go.psd1' | Select-object Verb, Count | Sort-object Verb"
+$code = "Get-PSModuleUsedVerbs -ModuleName '.\as2go.psd1' | Select-object Verb, Count, Approved | Sort-object Verb"
 Write-Syntax -Code $code
-$code = "                   Export-PSModuleMarkdownReport -ModuleName PSModuleQuantityAnalyzer"
+$code = "Export-PSModuleMarkdownReport -ModuleName PSModuleQuantityAnalyzer"
 Write-Syntax -Code $code
 
 Write-host "`n"
-$host.ui.RawUI.WindowTitle = "$SAModuleName - $($SAModuleManifest.Version)"
+# Opt in before importing: $env:PSModuleQA_SET_WINDOW_TITLE = '1'
+#if ($env:PSModuleQA_SET_WINDOW_TITLE -eq '1') {
+    try {
+        if ($null -ne $Host.UI -and $null -ne $Host.UI.RawUI) {
+            $Host.UI.RawUI.WindowTitle = "PsModuleQA - $($SAModuleManifest.Version)"
+        }
+    }
+    catch {
+        Write-Verbose "Unable to set the console window title: $_"
+    }
+#}
 

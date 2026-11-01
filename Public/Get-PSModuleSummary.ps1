@@ -23,12 +23,14 @@ PSModuleQuantityAnalyzer.
 
 .OUTPUTS
 PSCustomObject. The output contains module and count summary properties:
-ModuleName, Version, LastUpdate, ModulePath, PublicFunctions,
-PrivateFunctions, TotalFunctions, PublicFiles, PrivateFiles, TotalFiles,
+ModuleName, Version, LastUpdate, NestedModules, ModulePath, PublicFunctions,
+PrivateFunctions, TotalFunctions, DoubleFunctionPairs, Verbs, PublicFiles, PrivateFiles, TotalFiles,
 and TotalLines.
 
 .NOTES
 This function uses Get-PSModuleQuantity to calculate function counts.
+DoubleFunctionPairs counts distinct function names defined more than once,
+using the same grouping as Get-PSModuleDuplicateFunctions.
 #>
 function Get-PSModuleSummary {
 
@@ -65,6 +67,10 @@ function Get-PSModuleSummary {
 
     $quantityData = Get-PSModuleQuantity -ModuleName $ModuleName
 
+    $doubleFunctionPairs = @($quantityData |
+        Group-Object -Property Function |
+        Where-Object { $_.Count -gt 1 }).Count
+
     $publicFunctions = ($quantityData |
         Where-Object { $_.FullName -match "Public" }).Count
 
@@ -78,17 +84,22 @@ function Get-PSModuleSummary {
     $maxDate = ($allPSFiles | Measure-Object -Maximum LastWriteTime).Maximum
     $lastUpdate = if ($maxDate) { $maxDate.ToString('yyyy-MM-dd HH:mm:ss') } else { "unknown" }
 
+    $nestedModuleCount = @(Get-PSModuleNestedRoots -Module $module).Count
+    $verbCount = @(Get-PSModuleUsedVerbs -ModuleName $ModuleName).Count
+
 
     [PSCustomObject]@{
 
         ModuleName       = $module.Name
         Version          = $module.Version
         LastUpdate       = $lastUpdate
-
+        NestedModules    = $nestedModuleCount
 
         PublicFunctions  = $publicFunctions
         PrivateFunctions = $privateFunctions
         TotalFunctions   = $publicFunctions + $privateFunctions
+        DoubleFunctionPairs = $doubleFunctionPairs
+        Verbs            = $verbCount
 
         PublicFiles      = $publicFiles.Count
         PrivateFiles     = $privateFiles.Count

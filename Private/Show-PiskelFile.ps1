@@ -1,8 +1,10 @@
 function Show-PiskelFile {
     [CmdletBinding()]
     param(
-        [Parameter(Mandatory)]
+        [Parameter(Mandatory, ParameterSetName = 'Path')]
         [string]$PiskelPath,
+        [Parameter(Mandatory, ParameterSetName = 'Json')]
+        [string]$PiskelJson,
         [int]$LayerIndex = 0,
         [switch]$AddShadow,
         [int]$ShadowOffsetX = 1,
@@ -11,17 +13,11 @@ function Show-PiskelFile {
         [switch]$TreatBlackAsForeground
     )
 
-
     ################################################################################
     #####                                                                      ##### 
     #####    Description                ######                                 
     #####                                                                      #####
     ################################################################################
-
-    $CurrentFunction = Get-FunctionName
-    Write-Log -Message "### Start Function $CurrentFunction ###"
-    #$StartRunTime = (Get-Date).ToString($Script:DateFormatLog)
-    #################### main code | out- host #####################
 
     Add-Type -AssemblyName System.Drawing
 
@@ -54,21 +50,17 @@ public class VTConsole {
     if ($ShadowColor.Count -ne 3) {
         throw "ShadowColor must contain exactly 3 integers: R,G,B"
     }
-    
 
-
-    If (-not (Test-Path -LiteralPath $PiskelPath)) {
-        return
+    if ($PSCmdlet.ParameterSetName -eq 'Path') {
+        if (-not (Test-Path -LiteralPath $PiskelPath)) {
+            return
+        }
+        $PiskelJson = Get-Content -LiteralPath $PiskelPath -Raw -ErrorAction Stop
     }
 
-    $json = Get-Content -LiteralPath $PiskelPath -Raw | ConvertFrom-Json
-
+    $json = $PiskelJson | ConvertFrom-Json -ErrorAction Stop
     if (-not $json.piskel) {
-        $JsonData = Get-Content -Path $Script:T0VRIFilePath -Raw | ConvertFrom-Json
-        $json = $JsonData.PiskelLogo
-    }
-    else {
-        $json = Get-Content -LiteralPath $PiskelPath -Raw | ConvertFrom-Json
+        throw 'Piskel data must contain a piskel object.'
     }
 
     $width = [int]$json.piskel.width
@@ -253,13 +245,6 @@ public class VTConsole {
         $bitmap.Dispose()
         $memoryStream.Dispose()
     }
-    
-    
-    #$runtime = Get-RunTime -StartRunTime $StartRunTime
-    #Add-SAFunctionRunTime -Function $CurrentFunction -Runtime $runtime
-    #Write-Log -Message "    Run Time: $runtime [h] ###"
-    Write-Log -Message "### End Function $CurrentFunction ###"
+
 }
-
-
 

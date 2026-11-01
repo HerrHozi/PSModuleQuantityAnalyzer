@@ -1,21 +1,33 @@
-# Changelog
+# Change Log
 
-All notable changes to this project are documented in this file.
+```Text
+Author:          Holger Zimmermann | holgerz@semperis.com
+Current Version: 2026.10.26.1048
+Last Update:     2026-10-26
+```
 
-## Maintainer
+- Version 2026.10.26.1048
+  - Checkpoint
 
-- Holger Zimmermann [zimmermann.holger@live.de]
+- Version 2026.10.26.687
+  - Code Clean-Up / remove logging, Show DoubleFunctionPairs in  Get-PSModuleSummary
+  - Minor bug fixes and performance improvements
+
+- Version 2026.10.7.782
+  - Updated Function Get-PSModuleUsedVerbs | check for Approved verbs
 
 - Version 2026.10.7.652
-  - TBD
+  - Added Get-PSModuleNestedModules: version, function counts and line metrics for the main module and each nested module
+  - Added Get-PSModuleNestedDependencies: function calls between the main module and its nested modules
+  - Get-PSModuleQuantity returns the new property NestedModule ((main) for the module itself)
+  - Verified with Windows PowerShell 5.1 and PowerShell 7
 
-- Version 2026.10.7.650
-  - TBD
+- Version 2026.6.24.721
+  - Minor bug fixes and performance improvements
 
-## Current Release
-
-- Version: 2026.5.8.632
-- Last Update:     2026-10-07
+- Version 2026.6.16.1201
+  - Added Get-PSModuleDependencies: explicit (manifest), implicit (code) and transitive module dependencies
+  - Optional version compatibility check, output as object, console or JSON
 
 ## [2026.5.8.632]
 

@@ -3,51 +3,54 @@
 #
 
 @{
-    RootModule        = 'PSModuleQuantityAnalyzer.psm1'
-    ModuleVersion     = '2026.10.7.652'
-    GUID              = 'a5c1c2d4-1b11-4d55-b2d3-1d9a0e8b2f11'
+        RootModule        = 'PSModuleQuantityAnalyzer.psm1'
+        ModuleVersion     = '2026.10.26.1048'
+        GUID              = 'a5c1c2d4-1b11-4d55-b2d3-1d9a0e8b2f11'
 
-    Author            = 'Holger Zimmermann | zimmermann.holger@live.de'
-    CompanyName       = 'Community'
-    Copyright         = '(c) 2026 Holger Zimmermann'
+        Author            = 'Holger Zimmermann | zimmermann.holger@live.de'
+        CompanyName       = 'Community'
+        Copyright         = '(c) 2026 Holger Zimmermann'
 
-    Description       = "PSModuleQuantityAnalyzer performs static analysis of PowerShell modules, including their nested modules, and returns metrics about size, complexity, documentation coverage, dependencies and architecture. It finds unused private functions, duplicates and refactoring candidates and exports the results as Markdown or CSV reports."
+        Description       = "PSModuleQuantityAnalyzer performs static analysis of PowerShell modules, including their nested modules, and returns metrics about size, complexity, documentation coverage, dependencies and architecture. It finds unused private functions, duplicates and refactoring candidates and exports the results as Markdown or CSV reports."
 
-    PowerShellVersion = '5.1'
+        PowerShellVersion = '5.1'
 
-    FunctionsToExport = @(
-        "Get-PSModuleQuantity",
-        "Get-PSModuleSummary",
-        "Get-PSModuleMetrics",
-        "Get-PSModuleHealth",
-        "Get-PSModuleDuplicateFunctions",
-        "Get-PSModuleLargestFunctions",
-        "Get-PSModuleDocumentationCoverage",
-        "Get-PSModuleDependencyGraph",
-        "Get-PSModuleNestedModules",
-        "Get-PSModuleNestedDependencies",
-        "Get-PSModuleComplexity",
-        "Get-PSModuleUsedVerbs",
-        "Get-PSModuleUnusedPrivateFunctions",
-        "Get-PSModuleRefactoringCandidates",
-        "Get-PSModuleDependencies",
-        "Export-PSModuleQuantityReport",
-        "Export-PSModuleMarkdownReport"
-    )
+        FunctionsToExport = @(
+                "Get-PSModuleQuantity",
+                "Get-PSModuleSummary",
+                "Get-PSModuleMetrics",
+                "Get-PSModuleHealth",
+                "Get-PSModuleDuplicateFunctions",
+                "Get-PSModuleLargestFunctions",
+                "Get-PSModuleDocumentationCoverage",
+                "Get-PSModuleDependencyGraph",
+                "Get-PSModuleNestedModules",
+                "Get-PSModuleNestedDependencies",
+                "Get-PSModuleComplexity",
+                "Get-PSModuleUsedVerbs",
+                "Get-PSModuleUnusedPrivateFunctions",
+                "Get-PSModuleRefactoringCandidates",
+                "Get-PSModuleDependencies",
+                "Export-PSModuleQuantityReport",
+                "Export-PSModuleMarkdownReport"
+        )
 
-    CmdletsToExport   = @()
-    VariablesToExport = @()
-    AliasesToExport   = @()
+        CmdletsToExport   = @()
+        VariablesToExport = @()
+        AliasesToExport   = @()
 
-    PrivateData       = @{
-        PSData = @{
-            Tags         = @('PowerShell', 'Module', 'Metrics', 'StaticAnalysis', 'AST', 'CodeQuality', 'Maintainability', 'Complexity', 'Documentation', 'Dependencies', 'Report', 'PSEdition_Desktop', 'PSEdition_Core')
-            ProjectUri   = 'https://github.com/HerrHozi/PSModuleQuantityAnalyzer'
-            LicenseUri   = 'https://github.com/HerrHozi/PSModuleQuantityAnalyzer/blob/main/LICENSE'
-            IconUri      = 'https://raw.githubusercontent.com/HerrHozi/PSModuleQuantityAnalyzer/main/Assets/icon.png'
-            LastUpdate   = '2026-10-07'
-            ReleaseNotes = '            
+        PrivateData       = @{
+                PSData = @{
+                        Tags         = @('PowerShell', 'Module', 'Metrics', 'StaticAnalysis', 'AST', 'CodeQuality', 'Maintainability', 'Complexity', 'Documentation', 'Dependencies', 'Report', 'PSEdition_Desktop', 'PSEdition_Core')
+                        ProjectUri   = 'https://github.com/HerrHozi/PSModuleQuantityAnalyzer'
+                        LicenseUri   = 'https://github.com/HerrHozi/PSModuleQuantityAnalyzer/blob/main/LICENSE'
+                        IconUri      = 'https://raw.githubusercontent.com/HerrHozi/PSModuleQuantityAnalyzer/main/Assets/icon.png'
+                        LastUpdate   = '2026-10-26'
+                        ReleaseNotes = '            
             
+2026.10.26.1048
+        - Get-PSModuleSummary now returns the number of duplicate function names in DoubleFunctionPairs
+
 v2026.10.7.652
         - Added Get-PSModuleNestedModules: version, function counts and line metrics for the main module and each nested module
         - Added Get-PSModuleNestedDependencies: function calls between the main module and its nested modules
@@ -77,6 +80,6 @@ v2026.3.11.1221
         - Added Get-PSModuleQuantity, Get-PSModuleSummary, Get-PSModuleMetrics, Get-PSModuleHealth
         - Added Get-PSModuleDuplicateFunctions, Get-PSModuleLargestFunctions
 '
+                }
         }
-    }
 }
