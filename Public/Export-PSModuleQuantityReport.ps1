@@ -46,7 +46,7 @@ function Export-PSModuleQuantityReport {
 
 
     if (-not $Path) {
-        $Path = ".\Quantity_Report_{0}_{1}.md" -f $summary.ModuleName, $summary.Version
+        $Path = '.\ModuleAnalysis.csv'
     }
 
     $data = Get-PSModuleQuantity -ModuleName $ModuleName

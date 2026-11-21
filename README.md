@@ -9,8 +9,8 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.10.26.1048
-Last Update:     2026-10-26
+Current Version: 2026.11.21.1119
+Last Update:     2026-11-21
 ```
 
 PSModuleQuantityAnalyzer is a pure PowerShell module for the static analysis of
@@ -159,6 +159,15 @@ Export-PSModuleQuantityReport -ModuleName PSModuleQuantityAnalyzer -Path .\Modul
 
 Without `-Path`, the Markdown report is written to `ModuleAnalysis_<ModuleName>_<Version>.md` and the CSV report to `ModuleAnalysis.csv` in the current directory. A sample report is available in [Example](Example/ModuleAnalysis_PSModuleQuantityAnalyzer_2026.3.13.420.md).
 
+### Create a checkpoint (backup and new version)
+
+```powershell
+$env:PSModuleQuantityAnalyzer = 'C:\GitHub\PSModuleQuantityAnalyzer'
+Checkpoint-PSModuleVersion -Module PSModuleQuantityAnalyzer -Commit 'My change' -WhatIf
+```
+
+Unlike the other commands, `Checkpoint-PSModuleVersion` takes `-Module` and needs the project root in an environment variable named like the module (it contains the `Dev`, `Backup`, `Release` and `Archive` folders). Remove `-WhatIf` to create the backup, update the version and write the commit. See the [guide](Docs/Checkpoint-PSModuleVersion.md) for branches, push, releases and rollback.
+
 ## Example Output
 
 ### Module Metrics
@@ -219,10 +228,13 @@ FunctionB --> FunctionD
 
 ## Public Commands
 
+A guide for every command is available in [Docs](Docs/README.md).
+
 The module currently exports the following commands:
 
 | Command | Alias | Description |
 |---|---|---|
+| Checkpoint-PSModuleVersion | Module, SourceFolder, BackupFolder, ReleaseFolder, ArchiveFolder, NewBranch, Push, NewRelease, Commit, Rollback, ResetBranch, OrganizeBackups | Back up a module working tree, bump its version and optionally commit, push or release it. |
 | Export-PSModuleMarkdownReport | None | Export a comprehensive Markdown analysis report for a module. |
 | Export-PSModuleQuantityReport | None | Export the function-level quantity data of a module to a CSV file. |
 | Get-PSModuleComplexity | None | Calculate the cyclomatic complexity of each function. |

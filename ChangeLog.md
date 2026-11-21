@@ -1,12 +1,18 @@
 # Change Log
 
 ```Text
-Author:          Holger Zimmermann | holgerz@semperis.com
-Current Version: 2026.10.26.1048
-Last Update:     2026-10-26
+Author:          Holger Zimmermann | zimmermann.holger@live.de
+Current Version: 2026.11.21.1119
+Last Update:     2026-11-21
 ```
 
-- Version 2026.10.26.1048
+- Version 2026.11.21.1119
+  - add function Checkpoint-PSModuleVersion
+
+- Version 2026.11.21.1101
+  - Checkpoint
+
+- Version 2026.11.16.716
   - Checkpoint
 
 - Version 2026.10.26.687
