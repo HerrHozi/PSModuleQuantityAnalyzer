@@ -9,8 +9,8 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.11.21.1119
-Last Update:     2026-11-21
+Current Version: 2026.11.22.582
+Last Update:     2026-11-22
 ```
 
 PSModuleQuantityAnalyzer is a pure PowerShell module for the static analysis of
@@ -80,6 +80,8 @@ All commands take `-ModuleName`: the name of an installed module or the path to 
 Get-PSModuleSummary -ModuleName .\MyModule.psd1
 Get-PSModuleSummary -ModuleName PSModuleQuantityAnalyzer | Select-Object Version, Function, HelpTopics, TotalLines, LinesOfCode, LinesOfComment, References, PartOfFile | Format-Table
 ```
+
+Besides returning the object, `Get-PSModuleSummary` appends each result as one row to `%LOCALAPPDATA%\Get-PSModuleSummary.csv`. The file builds up a history of analyses (first column `DateOfAnalysis`) that can be evaluated later with `Import-Csv`, Excel or Power BI.
 
 ### Inventory all functions
 

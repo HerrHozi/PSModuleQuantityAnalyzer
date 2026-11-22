@@ -11,9 +11,23 @@ The function resolves the latest available module version, validates that the
 module exists, and then calculates counts based on module file structure and
 quantity report data.
 
+The result is also appended to the CSV file
+$env:LOCALAPPDATA\Get-PSModuleSummary.csv, so repeated analyses can be evaluated
+and compared later.
+
 .PARAMETER ModuleName
 Specifies the module to analyze. Use the module name as recognized by
 PowerShell (for example, a loaded module or module discoverable in PSModulePath).
+
+.PARAMETER ShowHistory
+Opens the CSV history $env:LOCALAPPDATA\Get-PSModuleSummary.csv in an
+Out-GridView window instead of analyzing a module. Cannot be combined with
+-ModuleName. Requires Out-GridView (Windows with a graphical session).
+
+.EXAMPLE
+Get-PSModuleSummary -ShowHistory
+
+Shows all previously recorded summaries in a grid view window.
 
 .EXAMPLE
 Get-PSModuleSummary -ModuleName PSModuleQuantityAnalyzer
@@ -30,19 +44,36 @@ Additionally HtmlFiles, MarkdownFiles and GraphicFiles (counts of .html/.htm,
 .md/.markdown and image files such as jpg, png, gif, bmp, svg, ico, webp, tif).
 
 .NOTES
-Each call appends the result as one row to
-$env:LOCALAPPDATA\Get-PSModuleSummary.csv.
+Besides returning the object, each call appends the result as one row to
+$env:LOCALAPPDATA\Get-PSModuleSummary.csv (UTF-8, comma separated, DateOfAnalysis
+as first column). The file builds up a history of analyses that can be used later for
+evaluation, for example with Import-Csv, Excel or Power BI. If the file cannot be
+written, a warning is shown and the summary object is still returned.
 This function uses Get-PSModuleQuantity to calculate function counts.
 DoubleFunctionPairs counts distinct function names defined more than once,
 using the same grouping as Get-PSModuleDuplicateFunctions.
 #>
 function Get-PSModuleSummary {
 
-    [CmdletBinding()]
+    [CmdletBinding(DefaultParameterSetName = 'Analyze')]
     param(
-        [Parameter(Mandatory)]
-        [string]$ModuleName
+        [Parameter(Mandatory, ParameterSetName = 'Analyze')]
+        [string]$ModuleName,
+
+        [Parameter(Mandatory, ParameterSetName = 'History')]
+        [switch]$ShowHistory
     )
+
+    $csvPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Get-PSModuleSummary.csv'
+
+    if ($ShowHistory) {
+        if (-not (Test-Path -LiteralPath $csvPath -PathType Leaf)) {
+            Write-Warning "No history found yet: $csvPath. Run Get-PSModuleSummary -ModuleName <module> first."
+            return
+        }
+        Import-Csv -LiteralPath $csvPath | Out-GridView -Title "Get-PSModuleSummary history ($csvPath)"
+        return
+    }
 
     $module = Get-Module -ListAvailable -Name $ModuleName | Sort-Object Version -Descending | Select-Object -First 1
 
@@ -127,10 +158,18 @@ function Get-PSModuleSummary {
         ModulePath       = $modulePath
     }
 
-    # Step 1: export the result to %LOCALAPPDATA%\Get-PSModuleSummary.csv
+    # Append the result to %LOCALAPPDATA%\Get-PSModuleSummary.csv (history for later evaluation)
     try {
-        $csvPath = Join-Path -Path $env:LOCALAPPDATA -ChildPath 'Get-PSModuleSummary.csv'
-        $result | Export-Csv -Path $csvPath -NoTypeInformation -Encoding UTF8 -Append -ErrorAction Stop
+        $csvParams = @{
+            Path        = $csvPath
+            Encoding    = 'UTF8'
+            Append      = $true
+            ErrorAction = 'Stop'
+        }
+        # PowerShell 7+ never writes type information (the switch is obsolete there);
+        # Windows PowerShell 5.1 needs it to suppress the '#TYPE' header line.
+        if ($PSVersionTable.PSVersion.Major -lt 6) { $csvParams.NoTypeInformation = $true }
+        $result | Export-Csv @csvParams
         Write-Verbose "Summary exported to $csvPath"
     }
     catch {

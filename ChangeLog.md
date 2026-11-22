@@ -2,9 +2,12 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.11.21.1119
-Last Update:     2026-11-21
+Current Version: 2026.11.22.582
+Last Update:     2026-11-22
 ```
+
+- Version 2026.11.22.582
+  - added docs
 
 - Version 2026.11.21.1119
   - add function Checkpoint-PSModuleVersion

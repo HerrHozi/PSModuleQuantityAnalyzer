@@ -2,7 +2,8 @@
 
 `Get-PSModuleSummary` returns **one object** that describes a module at a glance: identity,
 function counts, file counts, lines of code and the number of documentation and graphic files.
-Every call also appends the result to a CSV file, so you build a history of analyses.
+Every call also appends the result to a CSV file, so you build a history of analyses that you can
+evaluate later (trends of functions, lines or documentation per version).
 
 ## Usage
 
@@ -52,7 +53,30 @@ Read the history:
 Import-Csv "$env:LOCALAPPDATA\Get-PSModuleSummary.csv" |
     Where-Object ModuleName -eq 'PSModuleQuantityAnalyzer' |
     Format-Table DateOfAnalysis, Version, TotalFunctions, TotalLines
+
 ```
+
+Or browse and filter everything in a grid window with the switch `-ShowHistory`:
+
+```powershell
+Get-PSModuleSummary -ShowHistory
+```
+
+It opens the CSV with `Out-GridView` and does not analyze a module, so it cannot be combined with
+`-ModuleName`. If no history exists yet, a warning is shown. `Out-GridView` needs a graphical
+Windows session.
+
+Example content of the history (several modules, newest first, selected columns):
+
+| DateOfAnalysis | ModuleName | Version | PublicFunctions | PrivateFunctions | TotalFunctions | TotalLines | HtmlFiles | MarkdownFiles | GraphicFiles |
+| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| 2026-11-21 18:43:16.572 | PSModuleQuantityAnalyzer | 2026.11.21.1119 | 23 | 21 | 44 | 2390 | 0 | 22 | 1 |
+| 2026-11-21 17:01:06.135 | AS2Go | 2026.11.20.951 | 15 | 188 | 203 | 18147 | 33 | 8 | 42 |
+| 2026-11-16 12:14:55.456 | AS2Go | 2026.11.15.1060 | 15 | 182 | 197 | 17066 | 32 | 7 | 42 |
+| 2026-11-16 12:13:44.542 | PSModuleQuantityAnalyzer | 2026.11.16.716 | 22 | 16 | 38 | 1932 | 0 | 3 | 1 |
+
+Because every row has a timestamp, you can see how a module grows between versions, for example
+`AS2Go` gained 6 private functions and about 1,100 lines between the two analyses above.
 
 ## Examples
 
