@@ -83,11 +83,11 @@ function Get-PSModuleRefactoringCandidates {
             $issues += "HighComplexity"
         }
 
-        if ($f.References -eq 0 -and $f.Visibility -eq "Private") {
+        if ($f.References -eq 0 -and $f.Type -eq "Private") {
             $issues += "UnusedPrivateFunction"
         }
 
-        if ($f.HasHelp -eq $false) {
+        if ($f.HelpTopics -eq 0) {
             $issues += "NoDocumentation"
         }
 

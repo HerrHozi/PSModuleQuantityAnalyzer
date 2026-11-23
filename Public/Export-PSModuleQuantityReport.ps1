@@ -46,12 +46,16 @@ function Export-PSModuleQuantityReport {
 
 
     if (-not $Path) {
-        $Path = ".\Quantity_Report_{0}_{1}.md" -f $summary.ModuleName, $summary.Version
+        $Path = '.\ModuleAnalysis.csv'
     }
 
     $data = Get-PSModuleQuantity -ModuleName $ModuleName
 
-    $data | Export-Csv -Path $Path -NoTypeInformation -Encoding UTF8
+    $csvParams = @{ Path = $Path; Encoding = 'UTF8' }
+    # PowerShell 7+ never writes type information (the switch is obsolete there);
+    # Windows PowerShell 5.1 needs it to suppress the '#TYPE' header line.
+    if ($PSVersionTable.PSVersion.Major -lt 6) { $csvParams.NoTypeInformation = $true }
+    $data | Export-Csv @csvParams
 
 
     Invoke-Output -Type TextMaker -Message "Quantity Report report exported to: " -TextMaker $Path

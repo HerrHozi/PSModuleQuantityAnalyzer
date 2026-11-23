@@ -67,6 +67,8 @@ $code = "Get-PSModuleUsedVerbs -ModuleName '.\as2go.psd1' | Select-object Verb, 
 Write-Syntax -Code $code
 $code = "Export-PSModuleMarkdownReport -ModuleName PSModuleQuantityAnalyzer"
 Write-Syntax -Code $code
+$code = "`$env:PSModuleQuantityAnalyzer = 'C:\GitHub\PSModuleQuantityAnalyzer'; Checkpoint-PSModuleVersion -Module PSModuleQuantityAnalyzer -Commit 'My change' -WhatIf"
+Write-Syntax -Code $code
 
 Write-host "`n"
 # Opt in before importing: $env:PSModuleQA_SET_WINDOW_TITLE = '1'
