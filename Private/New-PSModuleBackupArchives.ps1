@@ -15,6 +15,8 @@ function New-PSModuleBackupArchives {
     )
 
     if (-not (Test-Path -LiteralPath $BackupFolder)) { return }
+    # Windows PowerShell 5.1 needs both assemblies (ZipArchive types live in System.IO.Compression)
+    Add-Type -AssemblyName System.IO.Compression
     Add-Type -AssemblyName System.IO.Compression.FileSystem
     foreach ($year in (Get-ChildItem -LiteralPath $BackupFolder -Directory | Where-Object Name -Match '^\d{4}$')) {
         foreach ($month in (Get-ChildItem -LiteralPath $year.FullName -Directory | Where-Object Name -Match '^(0[1-9]|1[0-2])$')) {

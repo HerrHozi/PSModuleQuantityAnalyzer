@@ -9,8 +9,8 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.11.22.582
-Last Update:     2026-11-22
+Current Version: 2026.11.23.478
+Last Update:     2026-11-23
 ```
 
 PSModuleQuantityAnalyzer is a pure PowerShell module for the static analysis of

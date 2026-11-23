@@ -2,9 +2,12 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.11.22.582
-Last Update:     2026-11-22
+Current Version: 2026.11.23.478
+Last Update:     2026-11-23
 ```
+
+- Version 2026.11.23.478
+  - 5.1 compatible
 
 - Version 2026.11.22.582
   - added docs

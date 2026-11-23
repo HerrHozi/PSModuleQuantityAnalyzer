@@ -176,7 +176,8 @@ function Checkpoint-PSModuleVersion {
         if ([string]::IsNullOrWhiteSpace($projectRoot)) {
             throw "Environment variable '$environmentName' is not set. Set it to the module project root or explicitly supply all four folder parameters."
         }
-        if (-not [IO.Path]::IsPathFullyQualified($projectRoot)) {
+        # IsPathFullyQualified does not exist in .NET Framework (Windows PowerShell 5.1)
+        if ($projectRoot -notmatch '^(?:[A-Za-z]:[\\/]|[\\/]{2}[^\\/])') {
             throw "Environment variable '$environmentName' must contain an absolute project-root path."
         }
         foreach ($folderParameter in $missingFolders) {

@@ -22,8 +22,7 @@ It does not analyze a module and does not upload anything to the PowerShell Gall
 
 ## Prerequisites
 
-- PowerShell 7+ (the path checks use `[IO.Path]::IsPathFullyQualified`, which Windows PowerShell
-  5.1 does not provide), the PSModuleQuantityAnalyzer module imported.
+- Windows PowerShell 5.1 or PowerShell 7+, the PSModuleQuantityAnalyzer module imported.
 - Git on the `PATH` for every Git action, `-NewRelease` and `-ResetBranch`.
 - The module working folder contains `<Module>.psd1`, `<Module>.psm1`, `README.md` and
   `ChangeLog.md`.
