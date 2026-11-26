@@ -4,7 +4,7 @@
 
 @{
         RootModule        = 'PSModuleQuantityAnalyzer.psm1'
-        ModuleVersion     = '2026.11.23.479'
+        ModuleVersion     = '2026.11.26.574'
         GUID              = 'a5c1c2d4-1b11-4d55-b2d3-1d9a0e8b2f11'
 
         Author            = 'Holger Zimmermann | zimmermann.holger@live.de'
@@ -46,9 +46,13 @@
                         ProjectUri   = 'https://github.com/HerrHozi/PSModuleQuantityAnalyzer'
                         LicenseUri   = 'https://github.com/HerrHozi/PSModuleQuantityAnalyzer/blob/main/LICENSE'
                         IconUri      = 'https://raw.githubusercontent.com/HerrHozi/PSModuleQuantityAnalyzer/main/Assets/icon.png'
-                        LastUpdate   = '2026-11-23'
+                        LastUpdate   = '2026-11-26'
                         ReleaseNotes = '            
             
+2026.11.23.1479
+        - Checkpoint-PSModuleVersion creates a verified backup of a module working tree, raises the module version and keeps the version information in the project files consistent. 
+        - Optionally it commits, pushes, creates a branch or builds a release folder.
+
 2026.10.26.1048
         - Get-PSModuleSummary now returns the number of duplicate function names in DoubleFunctionPairs
 

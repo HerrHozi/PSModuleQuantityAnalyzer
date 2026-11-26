@@ -25,6 +25,10 @@ $SAModuleName = $MyInvocation.MyCommand.ScriptBlock.Module.Name
 $SAModuleManifest = (Test-ModuleManifest -Path $(join-path $SAModulePath -ChildPath "\$SAModuleName.psd1"))
 $SAModuleLastUpdate = $SAModuleManifest.PrivateData.PSData.LastUpdate
 
+$SAModuleTopPath = Split-Path -Path $SAModulePath -Parent
+$env:PSModuleQuantityAnalyzer = $SAModuleTopPath
+
+
 $PublicFunctions = Get-ChildItem -Path "$PSScriptRoot/Public/*.ps1" -ErrorAction SilentlyContinue
 $PrivateFunctions = Get-ChildItem -Path "$PSScriptRoot/Private/*.ps1" -ErrorAction SilentlyContinue
 

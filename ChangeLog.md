@@ -2,9 +2,12 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.11.23.479
-Last Update:     2026-11-23
+Current Version: 2026.11.26.574
+Last Update:     2026-11-26
 ```
+
+- Version 2026.11.26.574
+  - Guide are ready
 
 - Version 2026.11.23.479
   - Checkpoint
@@ -12,17 +15,8 @@ Last Update:     2026-11-23
 - Version 2026.11.23.478
   - 5.1 compatible
 
-- Version 2026.11.22.582
-  - added docs
-
 - Version 2026.11.21.1119
   - add function Checkpoint-PSModuleVersion
-
-- Version 2026.11.21.1101
-  - Checkpoint
-
-- Version 2026.11.16.716
-  - Checkpoint
 
 - Version 2026.10.26.687
   - Code Clean-Up / remove logging, Show DoubleFunctionPairs in  Get-PSModuleSummary
