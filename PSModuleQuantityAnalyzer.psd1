@@ -4,7 +4,7 @@
 
 @{
         RootModule        = 'PSModuleQuantityAnalyzer.psm1'
-        ModuleVersion     = '2026.11.26.1366'
+        ModuleVersion     = '2026.11.26.1380'
         GUID              = 'a5c1c2d4-1b11-4d55-b2d3-1d9a0e8b2f11'
 
         Author            = 'Holger Zimmermann | zimmermann.holger@live.de'
@@ -51,7 +51,8 @@
                         LastUpdate   = '2026-11-26'
                         ReleaseNotes = '            
             
-2026.11.26.574
+2026.11.26.1366
+        - Added Publish-QAModule: publish a module to the PowerShell Gallery, optionally with a release folder and a GitHub release
         - Added the Docs folder with one guide per public command.
         - Get-PSModuleSummary counts files and functions in subfolders (for example Private\ASP07). Public and Private are decided by the path below the module root, so folders above the module no longer matter.
         - Get-PSModuleSummary has the new properties DateOfAnalysis, HtmlFiles, MarkdownFiles and GraphicFiles, and appends every call to $env:LOCALAPPDATA\Get-PSModuleSummary.csv as a history for later evaluation.
