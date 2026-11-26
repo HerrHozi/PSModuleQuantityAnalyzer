@@ -2,9 +2,12 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.11.26.574
+Current Version: 2026.11.26.1355
 Last Update:     2026-11-26
 ```
+
+- Version 2026.11.26.1355
+  - Fixed misted Nested Folder
 
 - Version 2026.11.26.574
   - Guides are ready: Docs folder with one guide per public command
