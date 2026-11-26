@@ -1,4 +1,52 @@
 function Publish-QAModule {
+    <#
+    .SYNOPSIS
+    Publishes a module to a PowerShell repository.
+
+    .DESCRIPTION
+    Publishes a module by calling Publish-Module. The module can be specified by
+    its name, a path to its manifest (.psd1), or a path to its directory.
+
+    NuGetApiKey accepts either a plain-text API key or the DPAPI-protected value
+    created by Set-NuGetApiKey. Protected values are decrypted for the current
+    Windows user. PowerShell 7.4 or later is required. Decrypting a protected
+    value also requires Windows and the same Windows user that stored the key.
+
+    .PARAMETER Name
+    Specifies the module name recognized by PowerShellGet, a path to a module
+    manifest (.psd1), or a path to a module directory.
+
+    .PARAMETER NuGetApiKey
+    Specifies the NuGet API key used to authenticate with the repository. Pass
+    the protected value from the current-user environment variable, such as
+    $env:NuGetApiKey, or a plain-text key.
+
+    .PARAMETER Repository
+    Specifies the PowerShell repository to publish to. The default is PSGallery.
+
+    .EXAMPLE
+    Set-NuGetApiKey
+    Publish-QAModule -Name .\PSModuleQuantityAnalyzer.psd1 -NuGetApiKey $env:NuGetApiKey
+
+    Prompts for and stores a protected API key, then publishes the module
+    manifest's containing directory to PSGallery.
+
+    .EXAMPLE
+    Publish-QAModule -Name .\PSModuleQuantityAnalyzer -NuGetApiKey $env:NuGetApiKey
+
+    Publishes the module from the specified directory using the protected key
+    stored in the current process environment.
+
+    .EXAMPLE
+    Publish-QAModule -Name PSModuleQuantityAnalyzer -NuGetApiKey $env:NuGetApiKey -Repository PSGallery -WhatIf
+
+    Shows which module and repository would be used without publishing.
+
+    .NOTES
+    Requires PowerShell 7.4 or later and the Publish-Module command, which is
+    provided by PowerShellGet. A DPAPI-protected key can only be decrypted by
+    the same Windows user who ran Set-NuGetApiKey.
+    #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [Parameter(Mandatory)]

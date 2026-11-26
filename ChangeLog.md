@@ -2,9 +2,12 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.11.26.1356
+Current Version: 2026.11.26.1366
 Last Update:     2026-11-26
 ```
+
+- Version 2026.11.26.1366
+  - added Publish-QAModule
 
 - Version 2026.11.26.1356
   - Fixed misted Nested Folder

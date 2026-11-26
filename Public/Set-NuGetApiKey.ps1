@@ -1,4 +1,43 @@
 function Set-NuGetApiKey {
+    <#
+    .SYNOPSIS
+    Stores a NuGet API key as a DPAPI-protected current-user environment variable.
+
+    .DESCRIPTION
+    Prompts for a NuGet API key as a SecureString, protects it with Windows DPAPI
+    using the current-user scope, and stores the Base64-encoded value in the
+    current user's environment variables. The protected value is also set in the
+    current PowerShell process so it can be passed directly to Publish-QAModule.
+
+    The key can only be decrypted by the same Windows user who stored it.
+    PowerShell 7.4 or later and Windows are required.
+
+    .PARAMETER VariableName
+    Specifies the environment variable name used to store the protected key.
+    The default is NuGetApiKey.
+
+    .EXAMPLE
+    Set-NuGetApiKey
+
+    Prompts for the API key and stores it in the current user's NuGetApiKey
+    environment variable.
+
+    .EXAMPLE
+    Set-NuGetApiKey -VariableName 'PSGalleryApiKey'
+
+    Prompts for the API key and stores it under a custom environment variable
+    name for the current user.
+
+    .EXAMPLE
+    Set-NuGetApiKey -WhatIf
+
+    Shows the environment variable update that would be performed without
+    prompting for or storing the key.
+
+    .NOTES
+    The stored value is encrypted for the current Windows user. Use the value
+    from the current process, for example $env:NuGetApiKey, with Publish-QAModule.
+    #>
     [CmdletBinding(SupportsShouldProcess)]
     param(
         [string]$VariableName = 'NuGetApiKey'

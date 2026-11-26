@@ -4,7 +4,7 @@
 
 @{
         RootModule        = 'PSModuleQuantityAnalyzer.psm1'
-        ModuleVersion     = '2026.11.26.1356'
+        ModuleVersion     = '2026.11.26.1366'
         GUID              = 'a5c1c2d4-1b11-4d55-b2d3-1d9a0e8b2f11'
 
         Author            = 'Holger Zimmermann | zimmermann.holger@live.de'

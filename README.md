@@ -9,7 +9,7 @@
 
 ```Text
 Author:          Holger Zimmermann | zimmermann.holger@live.de
-Current Version: 2026.11.26.1356
+Current Version: 2026.11.26.1366
 Last Update:     2026-11-26
 ```
 
@@ -170,6 +170,38 @@ Checkpoint-PSModuleVersion -Module PSModuleQuantityAnalyzer -Commit 'My change' 
 
 Unlike the other commands, `Checkpoint-PSModuleVersion` takes `-Module` and needs the project root in an environment variable named like the module (it contains the `Dev`, `Backup`, `Release` and `Archive` folders). Remove `-WhatIf` to create the backup, update the version and write the commit. See the [guide](Docs/Checkpoint-PSModuleVersion.md) for branches, push, releases and rollback.
 
+### Publish a module
+
+`Set-NuGetApiKey` securely prompts for a NuGet API key and stores it encrypted
+for the current Windows user. The protected value is saved in the user's
+`NuGetApiKey` environment variable and is also available in the current
+PowerShell process. `Publish-QAModule` accepts this protected value and decrypts
+it for the same Windows user before calling `Publish-Module`.
+
+These two publishing commands require **PowerShell 7.4 or later**. Storing and
+decrypting the protected key also requires Windows. `Publish-QAModule` requires
+the `Publish-Module` command from PowerShellGet.
+
+```powershell
+# Enter the key at the secure prompt; it is not echoed as plain text.
+Set-NuGetApiKey
+
+# Publish the module from its manifest to the default repository, PSGallery.
+Publish-QAModule -Name .\PSModuleQuantityAnalyzer.psd1 -NuGetApiKey $env:NuGetApiKey
+```
+
+To preview the publish target without publishing, add `-WhatIf`:
+
+```powershell
+Publish-QAModule -Name .\PSModuleQuantityAnalyzer.psd1 -NuGetApiKey $env:NuGetApiKey -WhatIf
+```
+
+`-Name` can be a module name, a path to a `.psd1` manifest, or a module
+directory. Use `-Repository` to select a different registered repository. The
+protected key can only be decrypted by the same Windows user who ran
+`Set-NuGetApiKey`. Avoid passing a plain-text key directly in a command, where
+it may be retained in command history.
+
 ## Example Output
 
 ### Module Metrics
@@ -254,6 +286,8 @@ The module currently exports the following commands:
 | Get-PSModuleSummary | None | Return a high-level summary of a module. |
 | Get-PSModuleUnusedPrivateFunctions | None | Return private functions that are not referenced. |
 | Get-PSModuleUsedVerbs | None | Return the verbs used by the functions of a module with their count. |
+| Publish-QAModule | None | Publish a module by name, manifest path or directory to a registered repository. |
+| Set-NuGetApiKey | None | Securely prompt for and store a DPAPI-protected NuGet API key for the current Windows user. |
 
 Use `Get-Help` for detailed command documentation:
 
