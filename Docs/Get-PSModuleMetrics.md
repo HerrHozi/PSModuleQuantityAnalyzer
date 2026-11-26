@@ -50,7 +50,7 @@ Get-PSModuleMetrics -ModuleName .\MyModule.psd1 | Format-List
 
 - The command runs five other analyses plus `Get-PSModuleSummary`, so it is slower than the single
   commands. For large modules start with `Get-PSModuleSummary` or `Get-PSModuleHealth`.
-- Because it calls `Get-PSModuleSummary`, every call also appends a row to
+- It calls `Get-PSModuleSummary -NoHistory`, so it does not add a row to the history file
   `%LOCALAPPDATA%\Get-PSModuleSummary.csv`.
 - The comment ratio only counts `#` lines inside functions. Help blocks above a function are not
   included.

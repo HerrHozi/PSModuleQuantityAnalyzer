@@ -36,7 +36,9 @@ Get-PSModuleQuantity -ModuleName PSModuleQuantityAnalyzer |
   when only private helpers lack help.
 - The help block is found when it is placed directly above the function, directly after the
   opening brace or at the end of the function body.
-- Only the presence of help is checked, not its quality.
+- Only the presence of help is checked, not its quality. A function counts as documented when at
+  least one help section (`.SYNOPSIS`, `.DESCRIPTION`, ...) is filled; the numbers match the
+  property `HelpTopics` of [Get-PSModuleQuantity](Get-PSModuleQuantity.md).
 
 ## See also
 

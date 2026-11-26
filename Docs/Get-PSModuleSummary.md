@@ -20,10 +20,10 @@ Get-PSModuleSummary -ModuleName .\MyModule.psd1
 | `ModuleName`, `Version` | Module and version that were analyzed (highest installed version) |
 | `LastUpdate` | Newest write time of any `.ps1`, `.psm1` or `.psd1` file in the module folder (not the `LastUpdate` entry of the manifest) |
 | `NestedModules` | Number of nested modules located in a sub folder |
-| `PublicFunctions`, `PrivateFunctions`, `TotalFunctions` | Function counts by folder (`Public` / `Private`) |
+| `PublicFunctions`, `PrivateFunctions`, `TotalFunctions` | Function counts. A function is public when a folder named `Public` is part of its path below the module root, every other function counts as private. `TotalFunctions` equals the number of rows of `Get-PSModuleQuantity` |
 | `DoubleFunctionPairs` | Number of function names that are defined more than once |
 | `Verbs` | Number of different verbs used in function names |
-| `PublicFiles`, `PrivateFiles`, `TotalFiles` | Number of `.ps1` files directly in the `Public` and `Private` folders |
+| `PublicFiles`, `PrivateFiles`, `TotalFiles` | Number of `.ps1` source files in the whole module tree, **including subfolders** such as `Private\ASP07`. Same rule as for the functions: public below a `Public` folder, all others private. Folders `tests`, `build` and `docs` are skipped |
 | `TotalLines` | Sum of `TotalLines` of all functions |
 | `HtmlFiles` | Files with extension `.html` or `.htm` |
 | `MarkdownFiles` | Files with extension `.md` or `.markdown` |
@@ -42,8 +42,10 @@ Each call appends one row to:
 
 - Encoding UTF-8, no type header, one row per call, with `DateOfAnalysis` as first column.
 - If the file cannot be written, a warning is shown and the object is still returned.
-- Several commands call `Get-PSModuleSummary` internally (`Get-PSModuleMetrics`,
-  `Export-PSModuleMarkdownReport`). Each of those calls adds a row as well.
+- Only a **deliberate call** adds a row. Commands that call `Get-PSModuleSummary` internally
+  (`Get-PSModuleMetrics`, `Export-PSModuleMarkdownReport`) use `-NoHistory`, so they do not.
+  Use `-NoHistory` yourself when you want the object without a history row, for example in a
+  script that runs often.
 - The column set must stay the same. If an older file with different columns exists, rename or
   delete it before the next call.
 
@@ -84,6 +86,9 @@ Because every row has a timestamp, you can see how a module grows between versio
 # Full object, including all properties
 Get-PSModuleSummary -ModuleName PSModuleQuantityAnalyzer | Format-List
 
+# Without a history row
+Get-PSModuleSummary -ModuleName PSModuleQuantityAnalyzer -NoHistory
+
 # Only the counts
 Get-PSModuleSummary -ModuleName PSModuleQuantityAnalyzer |
     Select-Object ModuleName, Version, TotalFunctions, TotalLines, MarkdownFiles, GraphicFiles
@@ -91,11 +96,14 @@ Get-PSModuleSummary -ModuleName PSModuleQuantityAnalyzer |
 
 ## Notes
 
-- `PublicFunctions` and `PrivateFunctions` are decided by whether the file path contains the text
-  `Public` or `Private`. A module stored in a folder with such a name in its path can be counted
-  wrongly.
-- Functions whose file path contains neither word (for example a `.ps1` in a `Helpers` folder) are
-  counted as neither public nor private, so `TotalFunctions` can be lower than the real number.
+- Only the path **below the module root** counts. A module stored in a folder named `Public` or
+  `Private` is not misclassified, and subfolders (`Private\ASP07\...`) are included.
+- Source files outside `Public` and `Private` (for example `LabSetup\*.ps1`) count as private.
+- Modules that are not declared as `NestedModules` in the manifest (for example folders below
+  `Modules\` that the module loads itself) are counted as part of the main module.
+- Analyze a module with the PowerShell version it was written for. Code that uses PowerShell 7
+  syntax is parsed incompletely by Windows PowerShell 5.1, which changes the line and function
+  numbers.
 
 ## See also
 

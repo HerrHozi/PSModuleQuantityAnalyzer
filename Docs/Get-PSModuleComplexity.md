@@ -1,6 +1,6 @@
 # Guide: Get-PSModuleComplexity
 
-`Get-PSModuleComplexity` calculates a simple **cyclomatic complexity** for every function. A higher
+`Get-PSModuleComplexity` calculates a **cyclomatic complexity** for every function. A higher
 value means more paths through the function, so more effort to read and to test.
 
 ## Usage
@@ -20,9 +20,20 @@ Get-PSModuleComplexity -ModuleName PSModuleQuantityAnalyzer | Sort-Object Comple
 
 ## How the score is calculated
 
-Every function starts with `1`. Each of these statements adds `1`:
+Every function starts with `1`. Every decision point adds `1`:
 
-`if`, `for`, `foreach`, `while`, `do/while`, `switch`, `catch`
+| Construct | Adds |
+| --- | --- |
+| `if` and each `elseif` | 1 per branch |
+| `for`, `foreach`, `while`, `do/while`, `do/until` | 1 per loop |
+| `switch` | 1 per case (the `default` branch does not count) |
+| `catch`, `trap` | 1 per clause |
+| `-and`, `-or`, `-xor` | 1 per operator |
+| ternary `? :` (PowerShell 7) and pipeline chains `&&`, `\|\|` | 1 each |
+
+Decision points inside a **nested function** count only for that nested function, not for the
+function that contains it. Script blocks such as `ForEach-Object { ... }` count for the function
+they are written in.
 
 ## How to read it
 
@@ -34,12 +45,13 @@ Every function starts with `1`. Each of these statements adds `1`:
 
 ## Limitations
 
-The score is intentionally simple:
-
-- `elseif` branches, `-and` / `-or` conditions, `trap` and `do/until` are **not** counted, so the
-  value is a lower bound.
-- Nested functions are counted in the outer function as well as in their own row.
 - Only static code is analyzed, not runtime paths.
+- The `??` operator and `-match`-style conditions are not counted as decisions.
+- Older versions of this module counted fewer constructs (no `elseif`, `-and`/`-or`, per-case
+  `switch`), so scores of the same code are now higher. Do not compare numbers from before and
+  after this change.
+- A file that the running PowerShell version cannot parse (for example PowerShell 7 syntax in
+  Windows PowerShell 5.1) is analyzed only partly; a warning names such files once.
 
 ## Examples
 

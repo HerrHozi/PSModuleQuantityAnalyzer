@@ -1,6 +1,6 @@
 # Guide: Get-PSModuleUnusedPrivateFunctions
 
-`Get-PSModuleUnusedPrivateFunctions` lists functions in the `Private` folder that are never called
+`Get-PSModuleUnusedPrivateFunctions` lists functions in the `Private` folder (subfolders such as `Private\ASP07` included) that are never called
 anywhere in the module. They are candidates for removal.
 
 ## Usage
@@ -22,9 +22,9 @@ A function is reported when its name is **never used as a command with a fixed n
 cases are not detected, so verify manually:
 
 - calls through a variable or string: `& $name`, `Invoke-Command`, `. $script`
-- the function name passed as a parameter value (for example `-Function Name`)
+- names built at runtime (`& ("Invoke-" + $x)`); names written as quoted text are counted as references
 - use from outside the module (tests, other modules, scripts in a `Tests` folder, which is not scanned)
-- calls from a `.psm1` file - only `.ps1` files are scanned
+- calls from outside the module' source files (other modules, build scripts)
 
 A good routine: search the repository for the name, delete it, run your tests, commit.
 

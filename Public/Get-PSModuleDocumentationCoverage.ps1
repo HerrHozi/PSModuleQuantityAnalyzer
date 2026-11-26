@@ -6,8 +6,9 @@ Calculates documentation coverage for functions in a PowerShell module.
 Get-PSModuleDocumentationCoverage analyzes all function definitions in the
 specified module and determines how many functions provide comment-based help.
 
-The function parses source files with PowerShell AST, counts total functions,
-counts functions with help content, and returns a coverage percentage.
+The function uses the function inventory of Get-PSModuleQuantity (parsed with the
+PowerShell AST), counts the functions that have comment-based help, and returns a
+coverage percentage.
 
 .PARAMETER ModuleName
 Specifies the module to analyze. Use the module name as recognized by
@@ -33,38 +34,12 @@ function Get-PSModuleDocumentationCoverage {
         [string]$ModuleName
     )
 
-    $quantity = Get-PSModuleQuantity -ModuleName $ModuleName
+    $quantity = @(Get-PSModuleQuantity -ModuleName $ModuleName)
 
-    $files = $quantity.FullName | Sort-Object -Unique
-
-    $totalFunctions = 0
-    $functionsWithHelp = 0
-
-    foreach ($file in $files) {
-
-        $ast = [System.Management.Automation.Language.Parser]::ParseFile(
-            $file,
-            [ref]$null,
-            [ref]$null
-        )
-
-        $functions = $ast.FindAll({
-            param($node)
-            $node -is [System.Management.Automation.Language.FunctionDefinitionAst]
-        }, $true)
-
-        foreach ($func in $functions) {
-
-            $totalFunctions++
-
-            if ($func.GetHelpContent()) {
-                $functionsWithHelp++
-            }
-
-        }
-
-    }
-
+    # HelpTopics = number of filled comment-based-help sections of a function.
+    # A function with at least one filled section counts as documented.
+    $totalFunctions = $quantity.Count
+    $functionsWithHelp = @($quantity | Where-Object { $_.HelpTopics -gt 0 }).Count
     $coverage = if ($totalFunctions -gt 0) {
         [math]::Round(($functionsWithHelp / $totalFunctions) * 100,2)
     } else {

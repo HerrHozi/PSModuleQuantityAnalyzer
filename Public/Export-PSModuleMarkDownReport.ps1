@@ -51,7 +51,7 @@ function Export-PSModuleMarkdownReport {
         [string]$Path
     )
 
-    $summary = Get-PSModuleSummary -ModuleName $ModuleName
+    $summary = Get-PSModuleSummary -ModuleName $ModuleName -NoHistory
     $metrics = Get-PSModuleMetrics -ModuleName $ModuleName
     $largest = Get-PSModuleLargestFunctions -ModuleName $ModuleName -Top 5
     $unused = Get-PSModuleUnusedPrivateFunctions -ModuleName $ModuleName

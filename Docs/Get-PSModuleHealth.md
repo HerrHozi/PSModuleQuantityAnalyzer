@@ -25,14 +25,14 @@ Get-PSModuleHealth -ModuleName PSModuleQuantityAnalyzer -LargeFunctionThreshold 
 | `TotalFunctions` | Number of functions |
 | `LargeFunctionThreshold` | Threshold that was used |
 | `FunctionsOverLargeFunctionThreshold` | Functions with `TotalLines` greater than the threshold |
-| `UnusedFunctions` | Functions with `References = 0` (**public and private**) |
+| `UnusedFunctions` | **Private** functions with `References = 0` (public functions are not counted) |
 | `FunctionsWithoutHelp` | Functions without comment-based help |
 | `TopReferencedFunctions` | The five most-called functions, comma separated |
 
 ## Important to know
 
-- `UnusedFunctions` includes **public functions**. A public command is normally not called inside its
-  own module, so it appears here although it is fine. To see only private functions use
+- `UnusedFunctions` counts private functions only, because a public command is normally not called
+  inside its own module. The list of the functions behind the number is returned by
   [Get-PSModuleUnusedPrivateFunctions](Get-PSModuleUnusedPrivateFunctions.md).
 - A value greater than `0` is a hint, not an error.
 - Use the same threshold when comparing versions, otherwise the numbers are not comparable.

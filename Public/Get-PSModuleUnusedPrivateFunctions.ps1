@@ -38,7 +38,7 @@ function Get-PSModuleUnusedPrivateFunctions {
     $data |
     Where-Object {
 
-        $_.FullName -match '\\Private\\' -and
+        (Get-PSModuleFileScope -RelativePath $_.RelativePath) -eq 'Private' -and
         $_.References -eq 0
 
     } |

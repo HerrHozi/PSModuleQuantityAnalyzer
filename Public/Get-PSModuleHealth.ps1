@@ -26,7 +26,7 @@ Returns a module health summary for PSModuleQuantityAnalyzer.
 .OUTPUTS
 PSCustomObject. The output includes ModuleName, Version, TotalFunctions,
 LargeFunctionThreshold, FunctionsOverLargeFunctionThreshold,
-UnusedFunctions, FunctionsWithoutHelp, and
+UnusedFunctions (private functions without any reference), FunctionsWithoutHelp, and
 TopReferencedFunctions.
 
 .NOTES
@@ -43,44 +43,22 @@ function Get-PSModuleHealth {
         [int]$LargeFunctionThreshold = 100
     )
 
-    $data = Get-PSModuleQuantity -ModuleName $ModuleName
+    $data = @(Get-PSModuleQuantity -ModuleName $ModuleName)
 
     if (-not $data) {
         throw "No data found for module '$ModuleName'"
     }
 
-    $largeFunctions = $data | Where-Object { $_.TotalLines -gt $LargeFunctionThreshold }
+    $largeFunctions = @($data | Where-Object { $_.TotalLines -gt $LargeFunctionThreshold })
 
-    $unusedFunctions = $data | Where-Object { $_.References -eq 0 }
+    # Only private functions can be reported as unused: a public function is meant to be
+    # called from outside the module, so it normally has no call inside it.
+    $unusedFunctions = @($data | Where-Object {
+            (Get-PSModuleFileScope -RelativePath $_.RelativePath) -eq 'Private' -and $_.References -eq 0
+        })
 
-    $missingHelp = @()
-
-    foreach ($item in $data) {
-
-        $ast = [System.Management.Automation.Language.Parser]::ParseFile(
-            $item.FullName,
-            [ref]$null,
-            [ref]$null
-        )
-
-        $functions = $ast.FindAll({
-                param($node)
-                $node -is [System.Management.Automation.Language.FunctionDefinitionAst]
-            }, $true)
-
-        foreach ($func in $functions) {
-
-            if ($func.Name -eq $item.Function) {
-
-                $help = $func.GetHelpContent()
-
-                if (-not $help) {
-                    $missingHelp += $item
-                }
-
-            }
-        }
-    }
+    # HelpTopics = number of filled comment-based-help sections; 0 means no help.
+    $missingHelp = @($data | Where-Object { $_.HelpTopics -eq 0 })
 
     $mostReferenced = $data | Sort-Object References -Descending | Select-Object -First 5
 

@@ -19,11 +19,11 @@ Get-PSModuleDuplicateFunctions -ModuleName PSModuleQuantityAnalyzer
 Returns duplicate function definitions found in PSModuleQuantityAnalyzer.
 
 .OUTPUTS
-PSCustomObject. The output includes Function, File, FullName, TotalLines,
-LinesOfCode, References, and DefinitionID.
+PSCustomObject. The output includes Function, PartOfFile, FullName, TotalLines,
+LinesOfCode, References, and DuplicateCount.
 
 .NOTES
-DefinitionID reflects how many times a given function name appears in the
+DuplicateCount reflects how many times a given function name appears in the
 module.
 #>
 function Get-PSModuleDuplicateFunctions {

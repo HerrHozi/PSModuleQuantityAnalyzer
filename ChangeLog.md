@@ -7,10 +7,25 @@ Last Update:     2026-11-26
 ```
 
 - Version 2026.11.26.574
-  - Guide are ready
+  - Guides are ready: Docs folder with one guide per public command
+  - Get-PSModuleSummary: files and functions in subfolders (for example Private\ASP07) are counted, Public/Private is decided by the path below the module root
+  - Get-PSModuleSummary: new properties DateOfAnalysis, HtmlFiles, MarkdownFiles, GraphicFiles
+  - Get-PSModuleSummary: every call is appended to %LOCALAPPDATA%\Get-PSModuleSummary.csv (history for later evaluation)
+  - Get-PSModuleSummary: new switches -ShowHistory (opens the history in Out-GridView) and -NoHistory (no history row, used by Get-PSModuleMetrics and Export-PSModuleMarkdownReport)
+  - Get-PSModuleQuantity: new property RelativePath; References also count quoted function names and calls in .psm1 files
+  - Get-PSModuleDependencies: rewritten (parser-based Import-Module / using module / #requires detection, manifest read as data, name or manifest path); fixes a failure on every call
+  - Get-PSModuleComplexity: also counts elseif, do/until, every switch case, trap, -and/-or/-xor, ternary and pipeline chains; nested functions counted separately (scores are higher than before)
+  - Get-PSModuleHealth: UnusedFunctions counts private functions only
+  - Get-PSModuleRefactoringCandidates: rules UnusedPrivateFunction and NoDocumentation work now
+  - Export-PSModuleQuantityReport: default path .\ModuleAnalysis.csv; no -NoTypeInformation warning in PowerShell 7
+  - Warning for files that the running PowerShell version cannot parse completely
+  - Faster module import (manifest read as data)
+  - Fixed help texts of Get-PSModuleDuplicateFunctions and Get-PSModuleUsedVerbs
 
 - Version 2026.11.23.479
-  - Checkpoint
+  - Checkpoint-PSModuleVersion creates a verified backup of a module working tree, raises the module version and keeps the version information in the project files consistent
+  - Optionally it commits, pushes, creates a branch or builds a release folder
+  - Runs in Windows PowerShell 5.1 and in PowerShell 7
 
 - Version 2026.11.23.478
   - 5.1 compatible

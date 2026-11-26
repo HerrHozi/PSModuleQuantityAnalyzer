@@ -49,9 +49,24 @@
                         LastUpdate   = '2026-11-26'
                         ReleaseNotes = '            
             
-2026.11.23.1479
+2026.11.26.574
+        - Added the Docs folder with one guide per public command.
+        - Get-PSModuleSummary counts files and functions in subfolders (for example Private\ASP07). Public and Private are decided by the path below the module root, so folders above the module no longer matter.
+        - Get-PSModuleSummary has the new properties DateOfAnalysis, HtmlFiles, MarkdownFiles and GraphicFiles, and appends every call to $env:LOCALAPPDATA\Get-PSModuleSummary.csv as a history for later evaluation.
+        - Get-PSModuleSummary -ShowHistory opens that history in Out-GridView. -NoHistory returns the summary without a history row; Get-PSModuleMetrics and Export-PSModuleMarkdownReport use it internally.
+        - Get-PSModuleQuantity has the new property RelativePath. References also count function names written as quoted text and calls in .psm1 files, which removes false unused private functions.
+        - Get-PSModuleDependencies was rewritten: it finds Import-Module, using module and #requires -Modules with the PowerShell parser, reads the manifest as data instead of running it, accepts a module name or a manifest path, and no longer fails on every call.
+        - Get-PSModuleComplexity also counts elseif, do/until, every switch case, trap, -and / -or / -xor, the ternary operator and pipeline chains, and counts nested functions separately. Scores are higher than in earlier versions.
+        - Get-PSModuleHealth reports UnusedFunctions for private functions only.
+        - Get-PSModuleRefactoringCandidates: the rules UnusedPrivateFunction and NoDocumentation work now.
+        - Export-PSModuleQuantityReport writes to .\ModuleAnalysis.csv by default. No more warning about -NoTypeInformation in PowerShell 7.
+        - A warning names files that the running PowerShell version cannot parse completely, for example PowerShell 7 code analyzed in Windows PowerShell 5.1.
+        - Faster module import: the manifest is read as data.
+
+2026.11.23.479
         - Checkpoint-PSModuleVersion creates a verified backup of a module working tree, raises the module version and keeps the version information in the project files consistent. 
         - Optionally it commits, pushes, creates a branch or builds a release folder.
+        - Runs in Windows PowerShell 5.1 and in PowerShell 7.
 
 2026.10.26.1048
         - Get-PSModuleSummary now returns the number of duplicate function names in DoubleFunctionPairs

@@ -42,7 +42,7 @@ function Get-PSModuleMetrics {
     $duplicates = Get-PSModuleDuplicateFunctions -ModuleName $ModuleName
     $unused = Get-PSModuleUnusedPrivateFunctions -ModuleName $ModuleName
 
-    $summary = Get-PSModuleSummary -ModuleName $ModuleName
+    $summary = Get-PSModuleSummary -ModuleName $ModuleName -NoHistory
 
     $largest = $quantity | Sort-Object TotalLines -Descending | Select-Object -First 1
 

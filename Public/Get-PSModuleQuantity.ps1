@@ -27,12 +27,15 @@ Groups the functions by nested module ('(main)' for the module itself).
 
 .OUTPUTS
 PSCustomObject. Each output object includes CollectionDate, ModuleName,
-Version, Function, NestedModule, TotalLines, LinesOfCode, LinesOfComment, References,
-PartOfFile, FullName, CreationDate, ModificationDate, and FileSize.
+Version, Function, NestedModule, Type, TotalLines, LinesOfCode, LinesOfComment, References,
+PartOfFile, RelativePath (path below the module root, including subfolders), FullName, CreationDate, ModificationDate, and FileSize.
 
 .NOTES
 This function uses internal helper functions to discover source files, parse
 AST data, build a reference map, and measure function line metrics.
+References count calls with a fixed command name and function names written as quoted
+text (for example & 'Get-Something' or -FunctionName 'Get-Something'), in .ps1 and .psm1
+files. Calls through variables are not detected.
 #>
 function Get-PSModuleQuantity {
 
@@ -50,13 +53,29 @@ function Get-PSModuleQuantity {
         throw "Module '$ModuleName' was not found."
     }
 
-    $files = Get-PSModuleSourceFiles -Module $module
-    $astCache = Get-PSModuleAstCache -Files $files
-    $referenceMap = Get-PSModuleReferenceMap -AstCache $astCache
+    # Functions come from the .ps1 files. Calls are also counted in .psm1 files (the module
+    # loader often uses helper functions), so those are parsed for the reference map only.
+    $allFiles = @(Get-PSModuleSourceFiles -Module $module -IncludePsm1)
+    $fullCache = Get-PSModuleAstCache -Files $allFiles
+    $astCache = @{}
+    foreach ($key in $fullCache.Keys) {
+        if ($key -like '*.ps1') { $astCache[$key] = $fullCache[$key] }
+    }
+    $referenceMap = Get-PSModuleReferenceMap -AstCache $fullCache
     $functions = Get-PSFunctionDefinitions -AstCache $astCache
     $nestedRoots = @(Get-PSModuleNestedRoots -Module $module | Sort-Object { $_.Root.Length } -Descending)
+    $moduleBase = [System.IO.Path]::GetFullPath($module.ModuleBase).TrimEnd('\', '/') + '\'
 
     foreach ($func in $functions) {
+
+        # Path below the module root; used for the Public/Private decision, so folders above
+        # the module and subfolders such as Private\ASP07 are handled correctly.
+        $relativePath = if ($func.File.StartsWith($moduleBase, [System.StringComparison]::OrdinalIgnoreCase)) {
+            $func.File.Substring($moduleBase.Length)
+        }
+        else {
+            $func.File
+        }
 
         $lineInfo = Measure-PSFunctionLines -FunctionAst $func
 
@@ -74,7 +93,7 @@ function Get-PSModuleQuantity {
         [PSCustomObject]@{
             Function         = $func.Name
             NestedModule     = if ($nested) { $nested.Name } else { '(main)' }
-            Type             = If (($func.File).ToLower().Contains('\public')) { 'Public' } else { 'Private' }
+            Type             = if ((Get-PSModuleFileScope -RelativePath $relativePath) -eq 'Public') { 'Public' } else { 'Private' }
             HelpTopics       = $helpTopics
             TotalLines       = $lineInfo.TotalLines
             LinesOfHelp      = $helpTopics
@@ -82,6 +101,7 @@ function Get-PSModuleQuantity {
             LinesOfComment   = $lineInfo.LinesOfComment
             References       = [int]$references
             PartOfFile       = $($func.File).Split('\')[-1]
+            RelativePath     = $relativePath
             ModificationDate = (Get-Item $func.File).LastWriteTime
             FullName         = $func.File
             CreationDate     = (Get-Item $func.File).CreationTime

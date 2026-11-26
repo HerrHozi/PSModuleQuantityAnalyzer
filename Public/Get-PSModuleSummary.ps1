@@ -5,7 +5,9 @@ Returns a high-level summary of a PowerShell module.
 .DESCRIPTION
 Get-PSModuleSummary analyzes the specified module and returns a compact
 summary containing module identity, number of public and private functions, and
-number of source files in Public and Private folders.
+number of source files in the module tree. Subfolders such as Private\ASP07 are
+included. A file or function is public when a folder named Public is part of its
+path below the module root; everything else counts as private.
 
 The function resolves the latest available module version, validates that the
 module exists, and then calculates counts based on module file structure and
@@ -18,6 +20,12 @@ and compared later.
 .PARAMETER ModuleName
 Specifies the module to analyze. Use the module name as recognized by
 PowerShell (for example, a loaded module or module discoverable in PSModulePath).
+
+.PARAMETER NoHistory
+Returns the summary without appending it to the CSV history
+$env:LOCALAPPDATA\Get-PSModuleSummary.csv. Used by commands that call this function
+internally (Get-PSModuleMetrics, Export-PSModuleMarkdownReport), so that only a
+deliberate call creates a history row.
 
 .PARAMETER ShowHistory
 Opens the CSV history $env:LOCALAPPDATA\Get-PSModuleSummary.csv in an
@@ -60,6 +68,9 @@ function Get-PSModuleSummary {
         [Parameter(Mandatory, ParameterSetName = 'Analyze')]
         [string]$ModuleName,
 
+        [Parameter(ParameterSetName = 'Analyze')]
+        [switch]$NoHistory,
+
         [Parameter(Mandatory, ParameterSetName = 'History')]
         [switch]$ShowHistory
     )
@@ -83,22 +94,18 @@ function Get-PSModuleSummary {
 
     $modulePath = $module.ModuleBase
 
-    $publicPath = Join-Path $modulePath "Public"
-    $privatePath = Join-Path $modulePath "Private"
+    # Source files in the whole module tree, including subfolders such as Private\ASP07.
+    # A file counts as public when a folder named Public is part of its path below the
+    # module root, every other source file counts as private.
+    $moduleBase = [System.IO.Path]::GetFullPath($modulePath).TrimEnd('\', '/') + '\'
+    $sourceFiles = @(Get-PSModuleSourceFiles -Module $module)
 
-    $publicFiles = if (Test-Path $publicPath) {
-        Get-ChildItem $publicPath -Filter *.ps1
-    }
-    else { 
-        @() 
-    }
-
-    $privateFiles = if (Test-Path $privatePath) {
-        Get-ChildItem $privatePath -Filter *.ps1
-    }
-    else { 
-        @() 
-    }
+    $publicFiles = @($sourceFiles | Where-Object {
+            (Get-PSModuleFileScope -RelativePath $_.FullName.Substring($moduleBase.Length)) -eq 'Public'
+        })
+    $privateFiles = @($sourceFiles | Where-Object {
+            (Get-PSModuleFileScope -RelativePath $_.FullName.Substring($moduleBase.Length)) -ne 'Public'
+        })
 
     $quantityData = Get-PSModuleQuantity -ModuleName $ModuleName
 
@@ -106,11 +113,8 @@ function Get-PSModuleSummary {
         Group-Object -Property Function |
         Where-Object { $_.Count -gt 1 }).Count
 
-    $publicFunctions = ($quantityData |
-        Where-Object { $_.FullName -match "Public" }).Count
-
-    $privateFunctions = ($quantityData |
-        Where-Object { $_.FullName -match "Private" }).Count
+    $publicFunctions = @($quantityData | Where-Object { $_.Type -eq 'Public' }).Count
+    $privateFunctions = @($quantityData | Where-Object { $_.Type -eq 'Private' }).Count
 
     $allPSFiles = Get-ChildItem -Path (Join-Path $modulePath '*') -Recurse -File |
     Where-Object { $_.Extension -in @('.ps1', '.psm1', '.psd1') }
@@ -158,8 +162,10 @@ function Get-PSModuleSummary {
         ModulePath       = $modulePath
     }
 
-    # Append the result to %LOCALAPPDATA%\Get-PSModuleSummary.csv (history for later evaluation)
-    try {
+    # Append the result to %LOCALAPPDATA%\Get-PSModuleSummary.csv (history for later evaluation).
+    # Commands that call this function internally pass -NoHistory, so only a deliberate call
+    # creates a history row.
+    if (-not $NoHistory) { try {
         $csvParams = @{
             Path        = $csvPath
             Encoding    = 'UTF8'
@@ -174,7 +180,7 @@ function Get-PSModuleSummary {
     }
     catch {
         Write-Warning "Unable to export summary to CSV: $_"
-    }
+    } }
 
     $result
 }

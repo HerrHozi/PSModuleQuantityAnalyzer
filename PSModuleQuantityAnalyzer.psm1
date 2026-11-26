@@ -21,8 +21,11 @@ $Script:ConsoleBGColor = [System.ConsoleColor]::Black    # Background remains bl
 $Script:ConsoleFGColor = [System.ConsoleColor]::Gray     # Default text gray
 
 $SAModulePath = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-$SAModuleName = $MyInvocation.MyCommand.ScriptBlock.Module.Name
-$SAModuleManifest = (Test-ModuleManifest -Path $(join-path $SAModulePath -ChildPath "\$SAModuleName.psd1"))
+# The module file is named like the module; $MyInvocation can be empty when the file is dot-sourced.
+$SAModuleName = [System.IO.Path]::GetFileNameWithoutExtension($PSCommandPath)
+# Read the manifest as data: much faster than Test-ModuleManifest, which validates the module on every import.
+$SAModuleManifest = Import-PowerShellDataFile -Path (Join-Path -Path $SAModulePath -ChildPath "$SAModuleName.psd1")
+$SAModuleVersion = $SAModuleManifest.ModuleVersion
 $SAModuleLastUpdate = $SAModuleManifest.PrivateData.PSData.LastUpdate
 
 $SAModuleTopPath = Split-Path -Path $SAModulePath -Parent
@@ -56,7 +59,7 @@ $Script:PSModuleQALogoJson = @'
 Show-PiskelFile -AddShadow -PiskelJson $Script:PSModuleQALogoJson
 
 Write-Host "  Description:     PSModuleQuantityAnalyzer performs static analysis of PowerShell modules, including their nested modules." -ForegroundColor Gray
-Write-Host "  Version:         $($SAModuleManifest.Version) | Last Update: $SAModuleLastUpdate | Author: $($SAModuleManifest.Author) " -ForegroundColor Gray
+Write-Host "  Version:         $SAModuleVersion | Last Update: $SAModuleLastUpdate | Author: $($SAModuleManifest.Author) " -ForegroundColor Gray
 Write-Host "`n[>] Quick-Start: " -ForegroundColor Gray
 
 $code = "Get-PSModuleSummary -ModuleName .\PSModuleQuantityAnalyzer.psd1"
@@ -79,7 +82,7 @@ Write-host "`n"
 #if ($env:PSModuleQA_SET_WINDOW_TITLE -eq '1') {
     try {
         if ($null -ne $Host.UI -and $null -ne $Host.UI.RawUI) {
-            $Host.UI.RawUI.WindowTitle = "PsModuleQA - $($SAModuleManifest.Version)"
+            $Host.UI.RawUI.WindowTitle = "PsModuleQA - $SAModuleVersion"
         }
     }
     catch {

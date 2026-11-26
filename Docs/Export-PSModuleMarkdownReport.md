@@ -38,8 +38,8 @@ An existing file is **overwritten**. The command prints the target path and retu
 
 - The report runs most analyses of the module, so it takes longer than the single commands on
   large modules.
-- It calls `Get-PSModuleSummary` more than once, so each report also adds rows to
-  `%LOCALAPPDATA%\Get-PSModuleSummary.csv`.
+- It calls `Get-PSModuleSummary -NoHistory`, so a report does not add a row to the history file
+  `%LOCALAPPDATA%\Get-PSModuleSummary.csv`. Run `Get-PSModuleSummary` yourself to record a row.
 - The `xychart-beta` diagram needs a recent Mermaid version. If it is not rendered, the data is
   still readable as text.
 - The report is written for GitHub-style Markdown. Tables with very long function names can become

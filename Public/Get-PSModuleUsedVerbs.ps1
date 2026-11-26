@@ -22,11 +22,11 @@ Returns the verbs used by functions in PSModuleQuantityAnalyzer.
 Get-PSModuleUsedVerbs -ModuleName PSModuleQuantityAnalyzer | Select-object Verb, Count, Approved | Sort-Object Verb
 Returns the used verbs and their counts, sorted alphabetically by verb.
 
-Get-PSModuleUsedVerbs -ModuleName PSModuleQuantityAnalyzer | Where-Object { -not $_.Supported }
+Get-PSModuleUsedVerbs -ModuleName PSModuleQuantityAnalyzer | Where-Object { -not $_.Approved }
 Returns the verbs that are not approved PowerShell verbs.
 
 .OUTPUTS
-PSCustomObject. Each output object includes Verb, Count, Supported, Functions,
+PSCustomObject. Each output object includes Verb, Count, Approved, Functions,
 CollectionDate, ModuleName, and Version.
 
 .NOTES
